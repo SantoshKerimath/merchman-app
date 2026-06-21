@@ -67,7 +67,7 @@ Without `SECURITY DEFINER` → infinite recursion → "stack depth limit exceede
 
 ---
 
-## What's Built (18 Jun 2026)
+## What's Built (21 Jun 2026)
 
 | Feature | Status | Location |
 |---|---|---|
@@ -79,11 +79,14 @@ Without `SECURITY DEFINER` → infinite recursion → "stack depth limit exceede
 | XLSX upload UI | ✅ | `app/(dashboard)/brands/[id]/upload/page.tsx` |
 | Upload API | ✅ | `app/api/brands/[id]/upload/route.ts` |
 | Settlement parser | ✅ | `lib/parsers/settlement.ts` |
+| PPC parser | ✅ | `lib/parsers/ppc.ts` |
 | Brand P&L dashboard | ✅ | `app/(dashboard)/brands/[id]/page.tsx` |
 | P&L engine | ✅ | `lib/pl-engine/compute.ts` |
 | Sidebar | ✅ | `components/dashboard/Sidebar.tsx` |
-| Product COGS entry | 🔜 Day 4 | — |
-| Net profit calc | 🔜 Day 4 | — |
+| Product COGS entry | ✅ | `components/dashboard/ProductsCOGSTable.tsx` |
+| Net profit calc | ✅ | `app/(dashboard)/brands/[id]/page.tsx` |
+| Advertising KPI strip | ✅ | `components/dashboard/AdvertisingKPIs.tsx` |
+| PPC import (upload ext.) | ✅ | `app/api/brands/[id]/upload/route.ts` |
 | Date range filter | 🔜 Day 6 | — |
 | Charts | 🔜 Day 6 | — |
 | SP-API integration | ⏳ Awaiting Amazon approval | — |
@@ -175,12 +178,16 @@ NEXT_PUBLIC_APP_URL           http://localhost:3000
 
 ---
 
-## What's Next (Day 4)
+## What's Next (Day 6)
 
-Run `brainstorming` + `writing-plans` skills before coding.
+Run `brainstorming` + `writing-plans` + `ui-ux-pro-max` skills before coding.
 
-1. `products` table — COGS entry form per brand
-2. Net profit = gross profit − COGS
-3. Brand dashboard: show net profit + net margin
-4. Amber warning if product has no COGS
-5. Daily metrics rollup → `daily_metrics` table
+1. Date range picker (7D / 30D / custom) — filter settlements + ppc_data
+2. Daily sales line chart (Recharts)
+3. Organic vs. PPC stacked bar chart
+4. Product breakdown DataTable (sortable: SKU, sales, units, gross profit, ACOS)
+
+**Key context:**
+- Brand page is server component — date filter needs searchParams or client wrapper
+- `ppc_data` has `start_date` / `end_date` columns (ISO date strings) for filtering
+- Advertising strip + P&L strip layout established in Day 5 — charts go below

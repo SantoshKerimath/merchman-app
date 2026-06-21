@@ -1,8 +1,15 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
-import { formatINR, formatPercent } from '@/lib/pl-engine/compute'
+import {
+  formatINR,
+  formatPercent,
+  computeACoS,
+  computeTACOs,
+  computeROAS,
+} from '@/lib/pl-engine/compute'
 import Link from 'next/link'
 import ProductsCOGSTable from '@/components/dashboard/ProductsCOGSTable'
+import AdvertisingKPIs from '@/components/dashboard/AdvertisingKPIs'
 
 export default async function BrandPage({
   params,
@@ -20,22 +27,28 @@ export default async function BrandPage({
 
   if (!brand) notFound()
 
-  // Settlement stats — include sku for COGS join
+  // Settlement stats
   const { data: stats } = await supabase
     .from('settlements')
     .select('sku, quantity, product_sales, fba_fees, selling_fees, tcs_cgst, tcs_sgst, tcs_igst, tds')
     .eq('brand_id', id)
     .not('product_sales', 'is', null)
 
-  // SKUs with COGS via RPC
+  // SKUs with COGS
   const { data: skuRows } = await supabase.rpc('get_brand_skus_with_cogs', {
     p_brand_id: id,
   })
 
+  // PPC aggregate
+  const { data: ppcStats } = await supabase
+    .from('ppc_data')
+    .select('spend, sales')
+    .eq('brand_id', id)
+
   const n = (v: number | null) => v ?? 0
   const totalRows = stats?.length ?? 0
 
-  // Brand-level gross profit
+  // --- P&L ---
   const totalSales = stats?.reduce((s, r) => s + n(r.product_sales), 0) ?? 0
   const totalFBA = stats?.reduce((s, r) => s + Math.abs(n(r.fba_fees)), 0) ?? 0
   const totalFees = stats?.reduce((s, r) => s + Math.abs(n(r.selling_fees)), 0) ?? 0
@@ -44,36 +57,44 @@ export default async function BrandPage({
   const grossProfit = totalSales - totalFBA - totalFees - totalTCS - totalTDS
   const grossMargin = totalSales > 0 ? grossProfit / totalSales : 0
 
-  // Net profit — COGS × units per SKU from settlement rows
+  // --- COGS ---
   const cogsBySku: Record<string, number> = {}
   for (const row of skuRows ?? []) {
     if (row.cogs && row.sku) cogsBySku[row.sku] = row.cogs
   }
-
   const totalCOGS = stats?.reduce((s, r) => {
     const cogs = r.sku ? (cogsBySku[r.sku] ?? 0) : 0
     return s + cogs * n(r.quantity)
   }, 0) ?? 0
-
-  const hasAnyCogs = Object.keys(cogsBySku).length > 0
   const hasFullCogs = (skuRows ?? []).length > 0 &&
     (skuRows ?? []).every(r => r.cogs !== null && r.cogs > 0)
+  const hasAnyCogs = Object.keys(cogsBySku).length > 0
 
-  const netProfit = grossProfit - totalCOGS
+  // --- Advertising ---
+  const hasPPC = (ppcStats?.length ?? 0) > 0
+  const ppcSpend = ppcStats?.reduce((s, r) => s + n(r.spend), 0) ?? 0
+  const ppcSales = ppcStats?.reduce((s, r) => s + n(r.sales), 0) ?? 0
+  const organicSales = totalSales - ppcSales
+  const acos = hasPPC ? computeACoS(ppcSpend, ppcSales) : null
+  const roas = hasPPC ? computeROAS(ppcSales, ppcSpend) : null
+  const tacos = hasPPC ? computeTACOs(ppcSpend, totalSales) : null
+
+  // --- Net Profit ---
+  const netProfit = grossProfit - totalCOGS - ppcSpend
   const netMargin = totalSales > 0 ? netProfit / totalSales : 0
 
-  const kpis = [
-    { label: 'Total Sales', value: formatINR(totalSales), sub: `${totalRows.toLocaleString()} transactions`, highlight: false, partial: false },
-    { label: 'FBA Fees', value: formatINR(totalFBA), sub: 'Fulfilment cost', highlight: false, partial: false },
-    { label: 'Referral Fees', value: formatINR(totalFees), sub: 'Selling fees', highlight: false, partial: false },
-    { label: 'TCS + TDS', value: formatINR(totalTCS + totalTDS), sub: 'Tax deductions', highlight: false, partial: false },
-    { label: 'Gross Profit', value: formatINR(grossProfit), sub: formatPercent(grossMargin) + ' margin', highlight: true, partial: false },
+  const plKpis = [
+    { label: 'Total Sales', value: formatINR(totalSales), sub: `${totalRows.toLocaleString()} transactions` },
+    { label: 'FBA Fees', value: formatINR(totalFBA), sub: 'Fulfilment cost' },
+    { label: 'Referral Fees', value: formatINR(totalFees), sub: 'Selling fees' },
+    { label: 'TCS + TDS', value: formatINR(totalTCS + totalTDS), sub: 'Tax deductions' },
+    { label: 'Gross Profit', value: formatINR(grossProfit), sub: formatPercent(grossMargin) + ' margin' },
     {
       label: 'Net Profit',
-      value: hasAnyCogs ? formatINR(netProfit) : '—',
-      sub: hasFullCogs ? formatPercent(netMargin) + ' margin' : 'COGS optional',
-      highlight: true,
-      partial: false,
+      value: hasAnyCogs || hasPPC ? formatINR(netProfit) : '—',
+      sub: hasFullCogs && hasPPC
+        ? formatPercent(netMargin) + ' margin'
+        : 'COGS + PPC optional',
     },
   ]
 
@@ -100,7 +121,7 @@ export default async function BrandPage({
         <div className="bg-white border border-slate-200 rounded-2xl p-12 text-center">
           <div className="text-4xl mb-4">📂</div>
           <h2 className="text-lg font-semibold text-slate-700 mb-2">No data yet</h2>
-          <p className="text-sm text-slate-500 mb-6">Upload your Amazon settlement file to see P&L.</p>
+          <p className="text-sm text-slate-500 mb-6">Upload your Amazon settlement file to see P&amp;L.</p>
           <Link
             href={`/brands/${id}/upload`}
             className="inline-block bg-[#0D9488] text-white text-sm font-semibold px-5 py-2.5 rounded-lg hover:bg-teal-700 transition-colors"
@@ -112,35 +133,32 @@ export default async function BrandPage({
 
       {totalRows > 0 && (
         <>
-          {/* KPI Strip */}
+          {/* 1. Advertising KPIs — primary (teal, top) */}
+          <AdvertisingKPIs
+            ppcSpend={ppcSpend}
+            ppcSales={ppcSales}
+            organicSales={organicSales}
+            acos={acos}
+            roas={roas}
+            tacos={tacos}
+            hasPPC={hasPPC}
+          />
+
+          {/* 2. P&L strip — secondary (navy, below, slightly smaller padding) */}
           <div className="grid grid-cols-2 md:grid-cols-6 gap-3 mb-4">
-            {kpis.map(k => (
+            {plKpis.map(k => (
               <div
                 key={k.label}
-                className={`rounded-xl p-4 border ${
-                  k.highlight
-                    ? 'bg-[#1E2761] border-[#1E2761] text-white'
-                    : 'bg-white border-slate-200'
-                }`}
+                className="rounded-xl p-3 border bg-[#1E2761] border-[#1E2761] text-white"
               >
-                <p className={`text-xs font-medium mb-1 ${k.highlight ? 'text-white/60' : 'text-slate-400'}`}>
-                  {k.label}
-                </p>
-                <p className={`text-lg font-bold ${k.highlight ? 'text-white' : 'text-slate-800'}`}>
-                  {k.value}
-                </p>
-                <p className={`text-xs mt-0.5 ${
-                  k.highlight
-                    ? k.partial ? 'text-amber-300' : 'text-white/50'
-                    : 'text-slate-400'
-                }`}>
-                  {k.sub}
-                </p>
+                <p className="text-xs font-medium mb-1 text-white/60">{k.label}</p>
+                <p className="text-base font-bold text-white">{k.value}</p>
+                <p className="text-xs mt-0.5 text-white/50">{k.sub}</p>
               </div>
             ))}
           </div>
 
-          {/* Products & COGS table */}
+          {/* 3. Products & COGS */}
           <ProductsCOGSTable
             brandId={id}
             initialProducts={(skuRows ?? []).map(r => ({

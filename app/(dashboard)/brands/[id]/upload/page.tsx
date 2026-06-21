@@ -6,6 +6,7 @@ import { useParams, useRouter } from 'next/navigation'
 interface UploadResult {
   success?: boolean
   inserted?: number
+  ppc_campaigns?: number
   skipped?: number
   errors?: string[]
   error?: string
@@ -128,6 +129,11 @@ export default function UploadPage() {
               <p className="text-sm text-teal-700 mt-1">
                 {result.inserted?.toLocaleString()} rows imported for {result.brand}
               </p>
+              {(result.ppc_campaigns ?? 0) > 0 && (
+                <p className="text-sm text-teal-700 mt-0.5">
+                  {result.ppc_campaigns?.toLocaleString()} PPC campaigns imported
+                </p>
+              )}
               {result.skipped && result.skipped > 0 && (
                 <p className="text-xs text-teal-500 mt-1">{result.skipped} empty rows skipped</p>
               )}
