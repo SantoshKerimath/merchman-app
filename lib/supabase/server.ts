@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { createClient as createSupabaseJsClient, type SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
 
 export async function createClient() {
@@ -28,9 +29,8 @@ export async function createClient() {
 }
 
 // Service role client — bypasses RLS entirely. Never expose to browser.
-export function createServiceClient() {
-  const { createClient: createSupabaseClient } = require('@supabase/supabase-js')
-  return createSupabaseClient<Database>(
+export function createServiceClient(): SupabaseClient<Database> {
+  return createSupabaseJsClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
     { auth: { persistSession: false } }
