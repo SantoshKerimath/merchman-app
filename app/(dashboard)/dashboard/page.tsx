@@ -74,7 +74,7 @@ export default async function CommandCenterPage() {
                   <p className="text-sm font-semibold text-slate-700">{hasData ? formatINR(totalSales) : '—'}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-slate-400">Gross Profit</p>
+                  <p className="text-xs text-slate-400">Net Revenue</p>
                   <p className={`text-sm font-semibold ${!hasData ? 'text-slate-400' : grossProfit >= 0 ? 'text-teal-600' : 'text-red-500'}`}>
                     {hasData ? formatINR(grossProfit) : '—'}
                   </p>

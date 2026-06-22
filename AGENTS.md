@@ -67,7 +67,7 @@ Without `SECURITY DEFINER` → infinite recursion → "stack depth limit exceede
 
 ---
 
-## What's Built (21 Jun 2026)
+## What's Built (22 Jun 2026)
 
 | Feature | Status | Location |
 |---|---|---|
@@ -87,8 +87,12 @@ Without `SECURITY DEFINER` → infinite recursion → "stack depth limit exceede
 | Net profit calc | ✅ | `app/(dashboard)/brands/[id]/page.tsx` |
 | Advertising KPI strip | ✅ | `components/dashboard/AdvertisingKPIs.tsx` |
 | PPC import (upload ext.) | ✅ | `app/api/brands/[id]/upload/route.ts` |
-| Date range filter | 🔜 Day 6 | — |
-| Charts | 🔜 Day 6 | — |
+| Date range filter | ✅ | `components/dashboard/DateFilterBar.tsx` |
+| Daily sales chart | ✅ | `components/charts/DailySalesChart.tsx` |
+| Organic vs PPC chart | ✅ | `components/charts/OrganicVsPPCChart.tsx` |
+| ACOS trend chart | ✅ | `components/charts/ACOSTrendChart.tsx` |
+| Spend vs sales chart | ✅ | `components/charts/SpendVsSalesChart.tsx` |
+| Product breakdown table | ✅ | `components/dashboard/ProductTable.tsx` |
 | SP-API integration | ⏳ Awaiting Amazon approval | — |
 | Inngest jobs | ⏳ Keys missing | — |
 | Monitor agent | ⏳ Not started | — |
@@ -178,16 +182,10 @@ NEXT_PUBLIC_APP_URL           http://localhost:3000
 
 ---
 
-## What's Next (Day 6)
+## What's Next (Day 7+)
 
-Run `brainstorming` + `writing-plans` + `ui-ux-pro-max` skills before coding.
-
-1. Date range picker (7D / 30D / custom) — filter settlements + ppc_data
-2. Daily sales line chart (Recharts)
-3. Organic vs. PPC stacked bar chart
-4. Product breakdown DataTable (sortable: SKU, sales, units, gross profit, ACOS)
-
-**Key context:**
-- Brand page is server component — date filter needs searchParams or client wrapper
-- `ppc_data` has `start_date` / `end_date` columns (ISO date strings) for filtering
-- Advertising strip + P&L strip layout established in Day 5 — charts go below
+Day 7 candidates (TBD — discuss with user):
+- Command Center polish: multi-brand portfolio stats (total sales, total PPC spend)
+- "Needs attention" badge per brand (high ACOS, missing COGS)
+- SP-API OAuth flow (when Amazon approval arrives)
+- Inngest jobs setup (settlement-sync, ppc-sync daily cron)

@@ -25,9 +25,20 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  // getUser() makes a network fetch to verify the JWT — can fail in dev Edge sandbox.
+  // Fall back to getSession() (cookie-only, no network) on error.
+  let user = null
+  try {
+    const { data } = await supabase.auth.getUser()
+    user = data.user
+  } catch {
+    try {
+      const { data } = await supabase.auth.getSession()
+      user = data.session?.user ?? null
+    } catch {
+      user = null
+    }
+  }
 
   // Redirect unauthenticated users to login
   if (

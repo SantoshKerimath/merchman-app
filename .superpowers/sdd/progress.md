@@ -17,3 +17,9 @@ Task 4: complete — brand page restructured (advertising top, P&L below, net pr
 Task 5: complete — AGENTS.md + docs/04_project_plan.md updated (Day 5 marked complete)
 
 Note: git commits to be done by user from Mac terminal.
+Task 1: complete — DateFilterBar created, tsc clean, review approved
+Task 2: complete — DailySalesChart, OrganicVsPPCChart, ACOSTrendChart, SpendVsSalesChart, tsc clean, review approved
+Task 3: complete — ProductTable with SkuRow named export, sortable, totals footer, tsc clean, review approved
+Task 4: complete — brand page replaced (searchParams, date filter, chart aggregation, all components wired), tsc clean, review approved. Minor: isoWeek year-boundary edge case; transaction_date no null guard.
+Task 5: complete — AGENTS.md updated (What's Built Day 6, What's Next Day 7+), docs/04_project_plan.md Day 6 section marked complete + daily log added
+Final review: clean (ready to merge). isoWeek UTC/local fix applied. Minor: SortIcon nested component pattern, transaction_date null guard. Trivial: ACOSTrendChart ternary after filter.
