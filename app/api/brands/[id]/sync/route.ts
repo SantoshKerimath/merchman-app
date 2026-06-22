@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { getAccessToken, type LwaConfig } from '@/lib/amazon/lwa'
 import {
   requestReport, pollReport, downloadReport,
@@ -28,12 +29,20 @@ export async function POST(
   const internalSecret = request.headers.get('x-inngest-secret')
   const isInternalCall = internalSecret && internalSecret === process.env.INNGEST_INTERNAL_SECRET
 
-  const supabase = await createClient()
-
   if (!isInternalCall) {
-    const { data: { user } } = await supabase.auth.getUser()
+    const ssrClient = await createClient()
+    const { data: { user } } = await ssrClient.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    // Verify brand belongs to this user's agency (RLS check via SSR client)
+    const { data: owned } = await ssrClient.from('brands').select('id').eq('id', brandId).single()
+    if (!owned) return NextResponse.json({ error: 'Brand not found' }, { status: 404 })
   }
+
+  // All DB ops use service role (bypasses RLS — ownership already verified above)
+  const supabase = createServiceClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
 
   const body = await request.json() as {
     report_type: SyncReportType

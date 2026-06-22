@@ -18,6 +18,14 @@ export async function getAccessToken(
   config: LwaConfig,
   cached?: TokenCache
 ): Promise<TokenCache> {
+  // Sandbox mode: skip real LWA exchange — reports.ts uses fixture data anyway
+  if (process.env.AMAZON_SANDBOX === 'true') {
+    return {
+      token: 'sandbox-access-token',
+      expiresAt: new Date(Date.now() + 3600 * 1000),
+    }
+  }
+
   // Return cached token if still valid (with buffer)
   if (cached) {
     const bufferMs = EXPIRY_BUFFER_SECS * 1000
