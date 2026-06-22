@@ -88,6 +88,62 @@ export type Database = {
           },
         ]
       }
+      brand_credentials: {
+        Row: {
+          access_token_cache: string | null
+          access_token_expires_at: string | null
+          brand_id: string
+          connected_at: string | null
+          created_at: string | null
+          id: string
+          last_sync_at: string | null
+          lwa_client_id: string
+          lwa_client_secret: string
+          lwa_refresh_token: string
+          marketplace_id: string
+          seller_id: string
+          sync_schedule: Json
+        }
+        Insert: {
+          access_token_cache?: string | null
+          access_token_expires_at?: string | null
+          brand_id: string
+          connected_at?: string | null
+          created_at?: string | null
+          id?: string
+          last_sync_at?: string | null
+          lwa_client_id: string
+          lwa_client_secret: string
+          lwa_refresh_token: string
+          marketplace_id?: string
+          seller_id: string
+          sync_schedule?: Json
+        }
+        Update: {
+          access_token_cache?: string | null
+          access_token_expires_at?: string | null
+          brand_id?: string
+          connected_at?: string | null
+          created_at?: string | null
+          id?: string
+          last_sync_at?: string | null
+          lwa_client_id?: string
+          lwa_client_secret?: string
+          lwa_refresh_token?: string
+          marketplace_id?: string
+          seller_id?: string
+          sync_schedule?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_credentials_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: true
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       brands: {
         Row: {
           agency_id: string
@@ -128,6 +184,50 @@ export type Database = {
             columns: ["agency_id"]
             isOneToOne: false
             referencedRelation: "agencies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_metrics: {
+        Row: {
+          avg_selling_price: number | null
+          brand_id: string
+          conversion_rate: number | null
+          created_at: string | null
+          date: string
+          id: string
+          ordered_sales: number | null
+          sessions: number | null
+          units_ordered: number | null
+        }
+        Insert: {
+          avg_selling_price?: number | null
+          brand_id: string
+          conversion_rate?: number | null
+          created_at?: string | null
+          date: string
+          id?: string
+          ordered_sales?: number | null
+          sessions?: number | null
+          units_ordered?: number | null
+        }
+        Update: {
+          avg_selling_price?: number | null
+          brand_id?: string
+          conversion_rate?: number | null
+          created_at?: string | null
+          date?: string
+          id?: string
+          ordered_sales?: number | null
+          sessions?: number | null
+          units_ordered?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_metrics_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
             referencedColumns: ["id"]
           },
         ]
@@ -470,6 +570,53 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "settlements_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sync_logs: {
+        Row: {
+          api_calls_used: number | null
+          brand_id: string
+          completed_at: string | null
+          created_at: string | null
+          error_message: string | null
+          id: string
+          report_type: string
+          rows_inserted: number | null
+          status: string
+          trigger: string
+        }
+        Insert: {
+          api_calls_used?: number | null
+          brand_id: string
+          completed_at?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          report_type: string
+          rows_inserted?: number | null
+          status?: string
+          trigger: string
+        }
+        Update: {
+          api_calls_used?: number | null
+          brand_id?: string
+          completed_at?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          report_type?: string
+          rows_inserted?: number | null
+          status?: string
+          trigger?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sync_logs_brand_id_fkey"
             columns: ["brand_id"]
             isOneToOne: false
             referencedRelation: "brands"

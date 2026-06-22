@@ -9,7 +9,7 @@
 MerchMan: AI-powered Amazon merchant analytics SaaS for Indian brand agencies. Pilot client: **Growz Scalers** (brands: Cadlec, Kridlo, TinyLane).
 
 **Builder:** Santosh Kerimath (kerimathsantosh@gmail.com)
-**Started:** 17 Jun 2026 | **Status:** Day 7 complete.
+**Started:** 17 Jun 2026 | **Status:** Day 8 complete.
 
 ---
 
@@ -175,15 +175,48 @@ RESEND_API_KEY                ⏳ Not configured
 NEXT_PUBLIC_APP_URL           http://localhost:3000
 ```
 
----
 
+---
 ## Amazon SP-API
 
 - Registered via Solution Provider Portal (public dev, no seller account needed)
 - Udyam MSME used for identity verification
-- **Status:** Verification submitted 17 Jun 2026, pending review
+- **Status:** Verified, OAuth + reporting implemented
 - Marketplace: `A21TJRUUN4KGV` | Region endpoint: `eu-west-1`
 
+## Day 8 — SP-API Infrastructure + Multi-Report Parsers
+
+### New files
+- `lib/amazon/lwa.ts` — LWA token refresh. `getAccessToken(config, cached?)` returns `{ token, expiresAt }`. Caches with 60s expiry buffer.
+- `lib/amazon/sp-api.ts` — `spRequest(accessToken, method, path, body?)`. Base URL set by `AMAZON_SANDBOX` env var.
+- `lib/amazon/reports.ts` — `requestReport / pollReport / downloadReport`. Sandbox: returns fixture strings, no real HTTP. `SyncTimeoutError` thrown after 2min.
+- `lib/parsers/settlement-v2.ts` — `parseSettlementV2(tsvText)`. Groups V2 rows by `(settlement-id, order-id, sku, posted-date)`, pivots `amount-type`/`amount-description`/`amount` into `ParsedSettlement`. Same output interface as `settlement.ts`.
+- `lib/parsers/advertising-campaign.ts` — `parseAdvertisingCampaign(csvText)`. Handles quoted CSV, ₹ formatting, MM/DD/YYYY dates. Outputs `ParsedPPC[]`.
+- `lib/parsers/business-report.ts` — `parseBusinessReport(csvText)`. DD/MM/YY dates, % → decimal. Outputs `ParsedBusinessMetric[]` → `business_metrics` table.
+- `app/api/amazon/auth/route.ts` — redirects to LWA consent URL with `state=brand_id`.
+- `app/api/amazon/callback/route.ts` — exchanges `spapi_oauth_code` → `refresh_token`, upserts `brand_credentials`.
+- `app/api/brands/[id]/sync/route.ts` — full pipeline: token refresh → requestReport → pollReport → downloadReport → parse → upsert. Writes `sync_logs`.
+- `app/api/brands/[id]/credentials/route.ts` — PATCH updates `sync_schedule`, DELETE disconnects.
+- `app/components/settings/SyncControls.tsx` — client: per-report-type sync buttons + last sync status.
+- `app/components/settings/ScheduleConfig.tsx` — client: manual/daily/weekly/custom schedule + on-login toggle. Auto-saves on change.
+- `app/app/(dashboard)/brands/[id]/settings/page.tsx` — settings page: connection status, sync now, schedule.
+- `app/components/charts/SessionsConversionChart.tsx` — dual-axis ComposedChart: sessions (left/navy) + CVR% (right/teal).
+
+### Modified files
+- `app/app/(dashboard)/brands/[id]/page.tsx` — gear icon → settings, `SessionsConversionChart` added to chart grid.
+
+### New DB tables
+- `brand_credentials` — per-brand SP-API tokens + sync schedule config. UNIQUE(brand_id).
+- `sync_logs` — audit trail: trigger, report_type, status, rows_inserted, api_calls_used.
+- `business_metrics` — daily ordered_sales, units, sessions, CVR, avg price. UNIQUE(brand_id, date).
+
+### Key patterns
+- `AMAZON_SANDBOX=true` → sandbox URLs + fixture data; no code change for prod flip
+- Parsers: all pure functions, `ParseResult<T>` output, Vitest-tested
+- Sync route: idempotent — settlements append, ppc_data delete+reinsert, business_metrics upsert on (brand_id, date)
+
+
+---
 ---
 
 ## What's Next (Day 8+)

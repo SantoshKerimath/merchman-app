@@ -1,0 +1,51 @@
+=== TASK 2: Vitest setup ===
+=== Changed/new files ===
+ package.json | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+=== vitest.config.ts ===
+import { defineConfig } from 'vitest/config'
+import path from 'path'
+
+export default defineConfig({
+  test: {
+    environment: 'node',
+    include: ['lib/**/__tests__/**/*.test.ts'],
+  },
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, '.'),
+    },
+  },
+})
+
+=== package.json scripts + devDependencies ===
+scripts: {
+  "dev": "next dev",
+  "build": "next build",
+  "start": "next start",
+  "lint": "eslint",
+  "test": "vitest run",
+  "test:watch": "vitest"
+}
+devDeps: {
+  "@tailwindcss/postcss": "^4",
+  "@types/node": "^20",
+  "@types/react": "^19",
+  "@types/react-dom": "^19",
+  "eslint": "^9",
+  "eslint-config-next": "16.2.9",
+  "tailwindcss": "^4",
+  "typescript": "^5",
+  "vitest": "^1.0.0"
+}
+
+=== scaffold test ===
+import { describe, it, expect } from 'vitest'
+import { parseSettlementV2 } from '../settlement-v2'
+
+describe('parseSettlementV2', () => {
+  it('parses a minimal valid V2 TSV', () => {
+    expect(true).toBe(false) // scaffold — will be replaced in Task 3
+  })
+})

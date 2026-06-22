@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 
 const navItems = [
   { href: '/dashboard', label: 'Command Center', icon: '⚡' },
-  { href: '/settings', label: 'Settings', icon: '⚙️' },
+  { href: '/settings', label: 'Brands', icon: '🏷️' },
 ]
 
 export default function Sidebar() {

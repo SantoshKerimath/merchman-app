@@ -47,8 +47,8 @@ export default function SettingsPage() {
   return (
     <div className="p-6 max-w-2xl">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-[#1E2761]">Settings</h1>
-        <p className="text-sm text-slate-500 mt-1">Manage your brands</p>
+        <h1 className="text-2xl font-bold text-[#1E2761]">Brands</h1>
+        <p className="text-sm text-slate-500 mt-1">Manage your brands and Amazon connections</p>
       </div>
 
       {/* Create brand */}
@@ -94,10 +94,16 @@ export default function SettingsPage() {
                     Upload data
                   </button>
                   <button
-                    onClick={() => router.push(`/brands/${b.id}`)}
-                    className="text-xs bg-slate-50 text-slate-700 font-medium px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors"
+                    onClick={() => router.push(`/brands/${b.id}/settings`)}
+                    className="text-xs bg-slate-50 text-slate-600 font-medium px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors"
                   >
-                    View dashboard
+                    Amazon settings
+                  </button>
+                  <button
+                    onClick={() => router.push(`/brands/${b.id}`)}
+                    className="text-xs bg-[#1E2761] text-white font-medium px-3 py-1.5 rounded-lg hover:bg-[#16205a] transition-colors"
+                  >
+                    Dashboard
                   </button>
                 </div>
               </div>

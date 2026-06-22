@@ -15,6 +15,7 @@ import DailySalesChart from '@/components/charts/DailySalesChart'
 import OrganicVsPPCChart from '@/components/charts/OrganicVsPPCChart'
 import ACOSTrendChart from '@/components/charts/ACOSTrendChart'
 import SpendVsSalesChart from '@/components/charts/SpendVsSalesChart'
+import SessionsConversionChart from '@/components/charts/SessionsConversionChart'
 
 function isoWeek(dateStr: string): string {
   const d = new Date(dateStr + 'T00:00:00')
@@ -71,6 +72,16 @@ export default async function BrandPage({
   if (from) ppcQuery = ppcQuery.gte('start_date', from)
   if (to) ppcQuery = ppcQuery.lte('start_date', to)
   const { data: ppcStats } = await ppcQuery
+
+  // Business metrics (date-filtered)
+  let bizQuery = supabase
+    .from('business_metrics')
+    .select('date, sessions, conversion_rate')
+    .eq('brand_id', id)
+    .order('date')
+  if (from) bizQuery = bizQuery.gte('date', from)
+  if (to)   bizQuery = bizQuery.lte('date', to)
+  const { data: bizMetrics } = await bizQuery
 
   const totalRows = stats?.length ?? 0
 
@@ -216,12 +227,14 @@ export default async function BrandPage({
           </p>
           <h1 className="text-2xl font-bold text-[#1E2761] mt-0.5">{brand.name}</h1>
         </div>
-        <Link
-          href={`/brands/${id}/upload`}
-          className="text-sm bg-[#0D9488] text-white font-semibold px-4 py-2 rounded-lg hover:bg-teal-700 transition-colors"
-        >
-          + Upload data
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href={`/brands/${id}/upload`}
+            className="text-sm bg-[#0D9488] text-white font-semibold px-4 py-2 rounded-lg hover:bg-teal-700 transition-colors"
+          >
+            + Upload data
+          </Link>
+        </div>
       </div>
 
       {/* Date filter */}
@@ -291,12 +304,13 @@ export default async function BrandPage({
             ))}
           </div>
 
-          {/* 3. Charts 2×2 */}
+          {/* 3. Charts grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <DailySalesChart data={dailySalesData} />
             <OrganicVsPPCChart data={weeklyPPCData} hasPPC={hasPPC} />
             <ACOSTrendChart data={weeklyPPCData} hasPPC={hasPPC} />
             <SpendVsSalesChart data={weeklyPPCData} hasPPC={hasPPC} />
+            <SessionsConversionChart data={bizMetrics ?? []} />
           </div>
 
           {/* 4. Product breakdown (with inline COGS editing) */}
