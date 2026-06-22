@@ -38,7 +38,8 @@ export async function POST(
     if (!owned) return NextResponse.json({ error: 'Brand not found' }, { status: 404 })
   }
 
-  // All DB ops use service role (bypasses RLS — ownership already verified above)
+  // All DB ops use service role (bypasses RLS — ownership already verified above via brands table)
+  // TODO(td-001): split user vs internal sync routes post go-live — see docs/05_production_checklist.md
   const supabase = createServiceClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
