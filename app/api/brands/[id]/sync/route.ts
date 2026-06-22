@@ -24,17 +24,24 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id: brandId } = await params
+
+  const internalSecret = request.headers.get('x-inngest-secret')
+  const isInternalCall = internalSecret && internalSecret === process.env.INNGEST_INTERNAL_SECRET
+
   const supabase = await createClient()
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!isInternalCall) {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
 
   const body = await request.json() as {
     report_type: SyncReportType
     date_from?: string
     date_to?: string
+    trigger?: string
   }
-  const { report_type, date_from, date_to } = body
+  const { report_type, date_from, date_to, trigger: syncTrigger } = body
 
   // Fetch credentials (RLS on brands table ensures brand belongs to user)
   const { data: creds } = await supabase
@@ -52,7 +59,7 @@ export async function POST(
     .from('sync_logs')
     .insert({
       brand_id: brandId,
-      trigger: 'manual',
+      trigger: syncTrigger ?? 'manual',
       report_type,
       status: 'pending',
     })
