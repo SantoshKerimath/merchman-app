@@ -95,6 +95,7 @@ export type Database = {
           created_at: string
           id: string
           is_active: boolean
+          is_pinned: boolean
           marketplace_id: string
           name: string
           sp_api_refresh_token: string | null
@@ -105,6 +106,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_active?: boolean
+          is_pinned?: boolean
           marketplace_id?: string
           name: string
           sp_api_refresh_token?: string | null
@@ -115,6 +117,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_active?: boolean
+          is_pinned?: boolean
           marketplace_id?: string
           name?: string
           sp_api_refresh_token?: string | null
@@ -524,7 +527,7 @@ export type Database = {
           units_sold: number
         }[]
       }
-      my_agency_id: { Args: Record<PropertyKey, never>; Returns: string }
+      my_agency_id: { Args: never; Returns: string }
     }
     Enums: {
       [_ in never]: never

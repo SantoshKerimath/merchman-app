@@ -9,7 +9,7 @@
 MerchMan: AI-powered Amazon merchant analytics SaaS for Indian brand agencies. Pilot client: **Growz Scalers** (brands: Cadlec, Kridlo, TinyLane).
 
 **Builder:** Santosh Kerimath (kerimathsantosh@gmail.com)
-**Started:** 17 Jun 2026 | **Status:** Day 3 complete. Upload → P&L working.
+**Started:** 17 Jun 2026 | **Status:** Day 7 complete.
 
 ---
 
@@ -93,6 +93,10 @@ Without `SECURITY DEFINER` → infinite recursion → "stack depth limit exceede
 | ACOS trend chart | ✅ | `components/charts/ACOSTrendChart.tsx` |
 | Spend vs sales chart | ✅ | `components/charts/SpendVsSalesChart.tsx` |
 | Product breakdown table | ✅ | `components/dashboard/ProductTable.tsx` |
+| Portfolio stats strip | ✅ | `app/(dashboard)/dashboard/page.tsx` |
+| Brand sort (Sales/Net Revenue/ACOS) | ✅ | `components/dashboard/SortBar.tsx` |
+| Brand pinning | ✅ | `components/dashboard/PinButton.tsx` + `api/brands/[id]/pin/route.ts` |
+| Attention badges (High ACOS, No COGS) | ✅ | `app/(dashboard)/dashboard/page.tsx` |
 | SP-API integration | ⏳ Awaiting Amazon approval | — |
 | Inngest jobs | ⏳ Keys missing | — |
 | Monitor agent | ⏳ Not started | — |
@@ -182,10 +186,9 @@ NEXT_PUBLIC_APP_URL           http://localhost:3000
 
 ---
 
-## What's Next (Day 7+)
+## What's Next (Day 8+)
 
-Day 7 candidates (TBD — discuss with user):
-- Command Center polish: multi-brand portfolio stats (total sales, total PPC spend)
-- "Needs attention" badge per brand (high ACOS, missing COGS)
+Day 8 candidates:
 - SP-API OAuth flow (when Amazon approval arrives)
 - Inngest jobs setup (settlement-sync, ppc-sync daily cron)
+- Brand page: date range comparison (current vs prior period)
