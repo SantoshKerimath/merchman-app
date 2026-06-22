@@ -134,7 +134,7 @@ export default async function BrandSettingsPage({
           <h2 className="text-base font-semibold text-[#1E2761]">Auto-sync Schedule</h2>
           <p className="text-xs text-slate-400 mt-0.5">
             {isConnected
-              ? 'Scheduled syncs run automatically. Powered by Inngest (coming soon).'
+              ? 'Scheduled syncs run automatically via Inngest.'
               : 'Connect Amazon above to configure auto-sync.'}
           </p>
         </div>
