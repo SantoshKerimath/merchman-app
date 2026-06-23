@@ -2,14 +2,31 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useState, useEffect } from 'react'
 
 const navItems = [
   { href: '/dashboard', label: 'Command Center', icon: '⚡' },
   { href: '/settings', label: 'Brands', icon: '🏷️' },
+  { href: '/alerts', label: 'Alerts', icon: '🔔' },
 ]
 
 export default function Sidebar() {
   const pathname = usePathname()
+  const [unresolvedCount, setUnresolvedCount] = useState(0)
+
+  useEffect(() => {
+    async function fetchCount() {
+      try {
+        const res = await fetch('/api/alerts?unresolved=true')
+        if (!res.ok) return
+        const { alerts } = await res.json()
+        setUnresolvedCount((alerts as unknown[]).length)
+      } catch { /* ignore */ }
+    }
+    fetchCount()
+    const interval = setInterval(fetchCount, 60_000)
+    return () => clearInterval(interval)
+  }, [])
 
   return (
     <aside className="w-56 flex-shrink-0 bg-[#1E2761] flex flex-col h-full">
@@ -24,7 +41,7 @@ export default function Sidebar() {
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 space-y-1">
         {navItems.map(item => {
-          const active = pathname === item.href
+          const active = pathname === item.href || pathname.startsWith(item.href + '/')
           return (
             <Link
               key={item.href}
@@ -36,7 +53,12 @@ export default function Sidebar() {
               }`}
             >
               <span>{item.icon}</span>
-              {item.label}
+              <span className="flex-1">{item.label}</span>
+              {item.href === '/alerts' && unresolvedCount > 0 && (
+                <span className="bg-red-500 text-white text-xs font-bold rounded-full px-1.5 py-0.5 min-w-[20px] text-center leading-tight">
+                  {unresolvedCount > 99 ? '99+' : unresolvedCount}
+                </span>
+              )}
             </Link>
           )
         })}

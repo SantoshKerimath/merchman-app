@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 
-interface Brand { id: string; name: string; created_at: string }
+interface Brand { id: string; name: string; created_at: string; is_pinned: boolean; is_connected: boolean }
 
 export default function SettingsPage() {
   const router = useRouter()
@@ -98,6 +98,18 @@ export default function SettingsPage() {
                     className="text-xs bg-slate-50 text-slate-600 font-medium px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors"
                   >
                     Amazon settings
+                  </button>
+                  <button
+                    onClick={() => b.is_connected && router.push(`/brands/${b.id}/alerts`)}
+                    disabled={!b.is_connected}
+                    title={!b.is_connected ? 'Connect Amazon first' : undefined}
+                    className={`text-xs font-medium px-3 py-1.5 rounded-lg transition-colors ${
+                      b.is_connected
+                        ? 'bg-amber-50 text-amber-700 hover:bg-amber-100 cursor-pointer'
+                        : 'bg-slate-50 text-slate-300 cursor-not-allowed'
+                    }`}
+                  >
+                    Alert config
                   </button>
                   <button
                     onClick={() => router.push(`/brands/${b.id}`)}

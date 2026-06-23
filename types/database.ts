@@ -92,6 +92,7 @@ export type Database = {
         Row: {
           access_token_cache: string | null
           access_token_expires_at: string | null
+          alert_config: Json | null
           brand_id: string
           connected_at: string | null
           created_at: string | null
@@ -107,6 +108,7 @@ export type Database = {
         Insert: {
           access_token_cache?: string | null
           access_token_expires_at?: string | null
+          alert_config?: Json | null
           brand_id: string
           connected_at?: string | null
           created_at?: string | null
@@ -122,6 +124,7 @@ export type Database = {
         Update: {
           access_token_cache?: string | null
           access_token_expires_at?: string | null
+          alert_config?: Json | null
           brand_id?: string
           connected_at?: string | null
           created_at?: string | null

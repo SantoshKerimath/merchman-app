@@ -20,17 +20,23 @@ export async function PATCH(
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await request.json() as {
-    sync_schedule: SyncSchedule
+    sync_schedule?: SyncSchedule
+    alert_config?: Record<string, unknown>
   }
-  const { sync_schedule } = body
+  const { sync_schedule, alert_config } = body
 
-  if (!sync_schedule) {
-    return NextResponse.json({ error: 'sync_schedule required' }, { status: 400 })
+  if (!sync_schedule && alert_config === undefined) {
+    return NextResponse.json({ error: 'sync_schedule or alert_config required' }, { status: 400 })
   }
 
+  const updates: Record<string, unknown> = {}
+  if (sync_schedule) updates.sync_schedule = sync_schedule
+  if (alert_config !== undefined) updates.alert_config = alert_config
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { error } = await supabase
     .from('brand_credentials')
-    .update({ sync_schedule: sync_schedule as unknown as Json })
+    .update(updates as any)
     .eq('brand_id', brandId)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

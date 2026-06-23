@@ -42,9 +42,17 @@ export async function GET() {
 
   const { data: brands } = await supabase
     .from('brands')
-    .select('*')
+    .select('*, brand_credentials(brand_id)')
     .eq('is_active', true)
     .order('name')
 
-  return NextResponse.json({ brands: brands ?? [] })
+  const result = (brands ?? []).map(b => ({
+    id: b.id,
+    name: b.name,
+    created_at: b.created_at,
+    is_pinned: b.is_pinned,
+    is_connected: Array.isArray(b.brand_credentials) && b.brand_credentials.length > 0,
+  }))
+
+  return NextResponse.json({ brands: result })
 }
