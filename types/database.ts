@@ -526,6 +526,83 @@ export type Database = {
           },
         ]
       }
+      ppc_targeting: {
+        Row: {
+          acos: number | null
+          ad_group: string | null
+          brand_id: string
+          campaign_name: string | null
+          clicks: number | null
+          cpc: number | null
+          ctr: number | null
+          cvr: number | null
+          end_date: string
+          id: string
+          imported_at: string | null
+          impressions: number | null
+          match_type: string | null
+          orders: number | null
+          roas: number | null
+          sales: number | null
+          spend: number | null
+          start_date: string
+          targeting: string | null
+          units: number | null
+        }
+        Insert: {
+          acos?: number | null
+          ad_group?: string | null
+          brand_id: string
+          campaign_name?: string | null
+          clicks?: number | null
+          cpc?: number | null
+          ctr?: number | null
+          cvr?: number | null
+          end_date: string
+          id?: string
+          imported_at?: string | null
+          impressions?: number | null
+          match_type?: string | null
+          orders?: number | null
+          roas?: number | null
+          sales?: number | null
+          spend?: number | null
+          start_date: string
+          targeting?: string | null
+          units?: number | null
+        }
+        Update: {
+          acos?: number | null
+          ad_group?: string | null
+          brand_id?: string
+          campaign_name?: string | null
+          clicks?: number | null
+          cpc?: number | null
+          ctr?: number | null
+          cvr?: number | null
+          end_date?: string
+          id?: string
+          imported_at?: string | null
+          impressions?: number | null
+          match_type?: string | null
+          orders?: number | null
+          roas?: number | null
+          sales?: number | null
+          spend?: number | null
+          start_date?: string
+          targeting?: string | null
+          units?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ppc_targeting_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           asin: string | null

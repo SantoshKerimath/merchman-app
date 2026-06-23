@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { useChatContext } from './ChatContext'
 import SessionList from './SessionList'
-import ChatMessage, { Message } from './ChatMessage'
+import ChatMessage, { Message, EmailDraft } from './ChatMessage'
 import ChatInput, { FileAttachment } from './ChatInput'
 import { ChartConfig } from './ChatChart'
 
@@ -23,7 +23,7 @@ interface ContextTag {
 // ─── SSE event type ───────────────────────────────────────────────────────────
 
 interface SSEEvent {
-  type: 'text' | 'tool_start' | 'tool_result' | 'chart' | 'file' | 'done' | 'error'
+  type: 'text' | 'tool_start' | 'tool_result' | 'chart' | 'file' | 'email' | 'done' | 'error'
   delta?: string
   tool?: string
   input?: unknown
@@ -32,6 +32,11 @@ interface SSEEvent {
   url?: string
   filename?: string
   ext?: string
+  // email fields
+  subject?: string
+  to?: string
+  body?: string
+  tone?: string
   session_id?: string
   input_tokens?: number
   output_tokens?: number
@@ -174,6 +179,7 @@ export default function ChatSidebar() {
         streaming: true,
         charts: [],
         files: [],
+        emails: [],
       }
       setMessages((prev) => [...prev, userMsg, assistantMsg])
       setStreaming(true)
@@ -250,6 +256,15 @@ export default function ChatSidebar() {
                         ...m,
                         files: [...(m.files ?? []), { url: event.url!, filename: event.filename!, ext: event.ext! }],
                       }
+                    case 'email': {
+                      const draft: EmailDraft = {
+                        subject: event.subject ?? '',
+                        to: event.to ?? '',
+                        body: event.body ?? '',
+                        tone: event.tone,
+                      }
+                      return { ...m, emails: [...(m.emails ?? []), draft] }
+                    }
                     case 'done':
                       if (event.session_id && !activeSessionId) pendingSessionId = event.session_id
                       return { ...m, streaming: false }

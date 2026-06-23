@@ -218,6 +218,16 @@ export async function POST(request: NextRequest) {
                 } catch (e) {
                   toolResultContent = JSON.stringify({ error: String(e) })
                 }
+              } else if (block.name === 'draft_email') {
+                // Email is composed by Claude itself — just surface it as a special SSE event
+                send({
+                  type: 'email',
+                  subject: input.subject,
+                  to: input.to,
+                  body: input.body,
+                  tone: input.tone ?? 'professional',
+                })
+                toolResultContent = JSON.stringify({ success: true, message: 'Email draft rendered for user' })
               } else if (block.name === 'analyze_with_gemini') {
                 try {
                   const text = await analyzeWithGemini(input.prompt, input.context)

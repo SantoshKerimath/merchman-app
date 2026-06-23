@@ -229,6 +229,12 @@ export default async function BrandPage({
         </div>
         <div className="flex items-center gap-2">
           <Link
+            href={`/brands/${id}/keywords`}
+            className="text-sm border border-slate-200 text-slate-600 font-medium px-4 py-2 rounded-lg hover:bg-slate-50 transition-colors"
+          >
+            🔍 Keywords
+          </Link>
+          <Link
             href={`/brands/${id}/upload`}
             className="text-sm bg-[#0D9488] text-white font-semibold px-4 py-2 rounded-lg hover:bg-teal-700 transition-colors"
           >

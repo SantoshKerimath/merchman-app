@@ -78,6 +78,29 @@ export const TOOL_DEFINITIONS: Anthropic.Tool[] = [
     },
   },
   {
+    name: 'draft_email',
+    description:
+      'Compose a professional client-ready email about brand performance. Use this when the user asks to draft, write, or create an email — performance update, weekly summary, campaign review, or any client communication. The email is returned as formatted text the user can copy.',
+    input_schema: {
+      type: 'object' as const,
+      properties: {
+        subject: { type: 'string', description: 'Email subject line' },
+        to: { type: 'string', description: 'Recipient name or role, e.g. "Client — Kridlo Team"' },
+        body: {
+          type: 'string',
+          description:
+            'Full email body in plain text with markdown formatting. Include greeting, key metrics/insights, narrative, and a clear closing. Use actual numbers from the data you queried.',
+        },
+        tone: {
+          type: 'string',
+          enum: ['professional', 'friendly', 'concise'],
+          description: 'Email tone',
+        },
+      },
+      required: ['subject', 'to', 'body'],
+    },
+  },
+  {
     name: 'analyze_with_gemini',
     description:
       'Use Gemini 2.5 Pro for heavy context analysis — long documents, multi-month data dumps, or cross-brand reports exceeding 10,000 words of context. Returns analysis as text.',
