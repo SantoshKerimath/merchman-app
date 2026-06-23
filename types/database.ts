@@ -235,6 +235,97 @@ export type Database = {
           },
         ]
       }
+      chat_messages: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          input_tokens: number | null
+          output_tokens: number | null
+          role: string
+          session_id: string
+          tool_input: Json | null
+          tool_name: string | null
+          tool_result: Json | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          input_tokens?: number | null
+          output_tokens?: number | null
+          role: string
+          session_id: string
+          tool_input?: Json | null
+          tool_name?: string | null
+          tool_result?: Json | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          input_tokens?: number | null
+          output_tokens?: number | null
+          role?: string
+          session_id?: string
+          tool_input?: Json | null
+          tool_name?: string | null
+          tool_result?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "chat_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_sessions: {
+        Row: {
+          brand_id: string | null
+          created_at: string | null
+          id: string
+          model: string
+          title: string
+          total_input_tokens: number | null
+          total_output_tokens: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          brand_id?: string | null
+          created_at?: string | null
+          id?: string
+          model?: string
+          title?: string
+          total_input_tokens?: number | null
+          total_output_tokens?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          brand_id?: string | null
+          created_at?: string | null
+          id?: string
+          model?: string
+          title?: string
+          total_input_tokens?: number | null
+          total_output_tokens?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_sessions_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       daily_metrics: {
         Row: {
           acos: number | null
@@ -667,6 +758,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      execute_chat_query: { Args: { query: string }; Returns: Json }
       get_brand_skus_with_cogs: {
         Args: { p_brand_id: string }
         Returns: {
