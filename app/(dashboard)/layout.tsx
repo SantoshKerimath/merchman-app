@@ -2,6 +2,9 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import Sidebar from '@/components/dashboard/Sidebar'
 import AlertToast from '@/components/alerts/AlertToast'
+import { ChatProvider } from '@/components/chat/ChatContext'
+import ChatLauncher from '@/components/chat/ChatLauncher'
+import ChatAwareLayout from '@/components/chat/ChatAwareLayout'
 
 export default async function DashboardLayout({
   children,
@@ -14,12 +17,15 @@ export default async function DashboardLayout({
   if (!user) redirect('/login')
 
   return (
-    <div className="flex h-screen bg-[#F8FAFC] overflow-hidden">
-      <Sidebar />
-      <main className="flex-1 overflow-y-auto">
-        {children}
-      </main>
-      <AlertToast />
-    </div>
+    <ChatProvider>
+      <div className="flex h-screen overflow-hidden">
+        <Sidebar />
+        <ChatAwareLayout>
+          {children}
+        </ChatAwareLayout>
+        <AlertToast />
+        <ChatLauncher />
+      </div>
+    </ChatProvider>
   )
 }
