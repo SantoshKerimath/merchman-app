@@ -5,7 +5,7 @@ import { usePathname, useSearchParams } from 'next/navigation'
 import { useChatContext } from './ChatContext'
 import SessionList from './SessionList'
 import ChatMessage, { Message } from './ChatMessage'
-import ChatInput from './ChatInput'
+import ChatInput, { FileAttachment } from './ChatInput'
 import { ChartConfig } from './ChatChart'
 
 // ─── Context tag types ────────────────────────────────────────────────────────
@@ -156,8 +156,16 @@ export default function ChatSidebar() {
   }
 
   const sendMessage = useCallback(
-    async (text: string) => {
-      const userMsg: Message = { id: `temp-${Date.now()}`, role: 'user', content: text }
+    async (text: string, fileAttachments: FileAttachment[] = []) => {
+      // Show attachment names inline in user bubble
+      const userDisplayContent = [
+        text,
+        ...fileAttachments.map((a) => `📎 ${a.file.name}`),
+      ]
+        .filter(Boolean)
+        .join('\n')
+
+      const userMsg: Message = { id: `temp-${Date.now()}`, role: 'user', content: userDisplayContent }
       const assistantMsgId = `stream-${Date.now()}`
       const assistantMsg: Message = {
         id: assistantMsgId,
@@ -172,6 +180,25 @@ export default function ChatSidebar() {
 
       const ctx = buildContextFromTags()
 
+      // Upload attachments before sending
+      let uploadedAttachments: unknown[] = []
+      if (fileAttachments.length > 0) {
+        uploadedAttachments = await Promise.all(
+          fileAttachments.map(async (a) => {
+            const fd = new FormData()
+            fd.append('file', a.file)
+            if (activeSessionId) fd.append('session_id', activeSessionId)
+            try {
+              const r = await fetch('/api/chat/upload', { method: 'POST', body: fd })
+              return r.ok ? await r.json() : null
+            } catch {
+              return null
+            }
+          })
+        )
+        uploadedAttachments = uploadedAttachments.filter(Boolean)
+      }
+
       try {
         const res = await fetch('/api/chat', {
           method: 'POST',
@@ -179,6 +206,7 @@ export default function ChatSidebar() {
           body: JSON.stringify({
             session_id: activeSessionId,
             message: text,
+            attachments: uploadedAttachments.length ? uploadedAttachments : undefined,
             ...ctx,
           }),
         })
@@ -242,7 +270,7 @@ export default function ChatSidebar() {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [activeSessionId, setActiveSessionId, contextTags]
+    [activeSessionId, setActiveSessionId, contextTags, buildContextFromTags]
   )
 
   return (

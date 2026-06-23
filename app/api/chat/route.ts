@@ -14,6 +14,47 @@ function sse(data: unknown): string {
   return `data: ${JSON.stringify(data)}\n\n`
 }
 
+interface UploadedAttachment {
+  url: string | null
+  filename: string
+  ext: string
+  extracted_text: string
+  is_image: boolean
+  media_type: string
+}
+
+/** Build user message content — plain string or multi-content block with images */
+function buildUserContent(
+  message: string,
+  attachments: UploadedAttachment[]
+): Anthropic.MessageParam['content'] {
+  const textAttachments = attachments.filter((a) => !a.is_image)
+  const imageAttachments = attachments.filter((a) => a.is_image)
+
+  const textParts = [message]
+  textAttachments.forEach((a) => {
+    textParts.push(`\n\n[Attached file: ${a.filename}]\n${a.extracted_text}`)
+  })
+  const fullText = textParts.join('')
+
+  if (imageAttachments.length === 0) return fullText
+
+  const blocks: Anthropic.ContentBlockParam[] = imageAttachments.map((a) => ({
+    type: 'image' as const,
+    source: {
+      type: 'base64' as const,
+      media_type: (a.media_type || 'image/png') as
+        | 'image/jpeg'
+        | 'image/png'
+        | 'image/gif'
+        | 'image/webp',
+      data: a.extracted_text,
+    },
+  }))
+  blocks.push({ type: 'text' as const, text: fullText })
+  return blocks
+}
+
 export async function POST(request: NextRequest) {
   const encoder = new TextEncoder()
 
@@ -42,6 +83,7 @@ export async function POST(request: NextRequest) {
           date_from?: string
           date_to?: string
           extra_tags?: string[]
+          attachments?: UploadedAttachment[]
         }
 
         const serviceClient = createServiceClient()
@@ -84,10 +126,17 @@ export async function POST(request: NextRequest) {
         const history = (historyRows ?? []) as { role: string; content: string }[]
 
         // Build Anthropic messages
-        const messages: Anthropic.MessageParam[] = history.map((h) => ({
-          role: h.role === 'user' ? 'user' : 'assistant',
-          content: h.content,
-        }))
+        const attachments = body.attachments ?? []
+        const messages: Anthropic.MessageParam[] = history.map((h, i) => {
+          const isCurrentUserMsg =
+            h.role === 'user' && i === history.length - 1 && attachments.length > 0
+          return {
+            role: h.role === 'user' ? 'user' : 'assistant',
+            content: isCurrentUserMsg
+              ? buildUserContent(h.content, attachments)
+              : h.content,
+          }
+        })
 
         // Brand context for system prompt
         let brandCtx: BrandContext | undefined = undefined
