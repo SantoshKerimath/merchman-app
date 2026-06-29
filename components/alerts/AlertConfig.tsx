@@ -69,19 +69,19 @@ export default function AlertConfig({ brandId, initialConfig }: Props) {
   return (
     <div className="space-y-6">
       {/* WhatsApp number */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-6">
-        <h2 className="text-base font-semibold text-[#1E2761] mb-4">WhatsApp Notifications</h2>
+      <div className="bg-surface-card border border-border-default rounded-2xl p-6">
+        <h2 className="text-base font-semibold text-text-primary mb-4">WhatsApp Notifications</h2>
         <div className="flex items-center gap-3">
-          <label className="text-sm text-slate-500 w-40">WhatsApp number</label>
+          <label className="text-sm text-text-secondary w-40">WhatsApp number</label>
           <input
             type="tel"
             value={config.whatsapp_number}
             onChange={e => setConfig(c => ({ ...c, whatsapp_number: e.target.value }))}
             placeholder="+91XXXXXXXXXX"
-            className="flex-1 max-w-xs border border-slate-200 rounded-lg px-3 py-1.5 text-sm text-slate-700 focus:outline-none focus:ring-1 focus:ring-teal-500"
+            className="flex-1 max-w-xs border border-border-default rounded-lg px-3 py-1.5 text-sm bg-surface-card text-text-primary focus:outline-none focus:ring-1 focus:ring-accent-primary"
           />
         </div>
-        <p className="text-xs text-slate-400 mt-2">Leave blank to disable WhatsApp alerts.</p>
+        <p className="text-xs text-text-muted mt-2">Leave blank to disable WhatsApp alerts.</p>
       </div>
 
       <AlertSection
@@ -117,12 +117,12 @@ export default function AlertConfig({ brandId, initialConfig }: Props) {
         <button
           onClick={save}
           disabled={saving}
-          className="bg-[#0D9488] text-white text-sm font-semibold px-5 py-2.5 rounded-lg hover:bg-teal-700 transition-colors disabled:opacity-50"
+          className="bg-accent-primary text-text-on-brand text-sm font-semibold px-5 py-2.5 rounded-lg hover:bg-accent-primary-hover transition-colors disabled:opacity-50"
         >
           {saving ? 'Saving…' : 'Save alert config'}
         </button>
-        {saved && <p className="text-sm text-teal-600 font-medium">✓ Saved</p>}
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {saved && <p className="text-sm text-data-positive font-medium">✓ Saved</p>}
+        {error && <p className="text-sm text-data-negative">{error}</p>}
       </div>
     </div>
   )
@@ -146,25 +146,25 @@ function AlertSection({
   onChange: (field: keyof AlertTypeConfig, value: number | boolean) => void
 }) {
   return (
-    <div className={`bg-white border border-slate-200 rounded-2xl p-6 transition-opacity ${!config.enabled ? 'opacity-60' : ''}`}>
+    <div className={`bg-surface-card border border-border-default rounded-2xl p-6 transition-opacity ${!config.enabled ? 'opacity-60' : ''}`}>
       <div className="flex items-center justify-between mb-1">
-        <h2 className="text-base font-semibold text-[#1E2761]">{title}</h2>
+        <h2 className="text-base font-semibold text-text-primary">{title}</h2>
         <button
           onClick={() => onChange('enabled', !config.enabled)}
-          className={`relative inline-flex h-5 w-9 rounded-full transition-colors ${config.enabled ? 'bg-teal-500' : 'bg-slate-300'}`}
+          className={`relative inline-flex h-5 w-9 rounded-full transition-colors ${config.enabled ? 'bg-accent-primary' : 'bg-surface-raised'}`}
         >
           <span
-            className={`inline-block h-4 w-4 rounded-full bg-white shadow transform transition-transform mt-0.5 ${config.enabled ? 'translate-x-4' : 'translate-x-0.5'}`}
+            className={`inline-block h-4 w-4 rounded-full bg-surface-card shadow transform transition-transform mt-0.5 ${config.enabled ? 'translate-x-4' : 'translate-x-0.5'}`}
           />
         </button>
       </div>
-      <p className="text-xs text-slate-400 mb-4">{description}</p>
+      <p className="text-xs text-text-muted mb-4">{description}</p>
 
       <div className="grid grid-cols-2 gap-4">
         <NumField label={warningLabel} value={config.warning_threshold} onChange={v => onChange('warning_threshold', v)} />
         <NumField label={criticalLabel} value={config.critical_threshold} onChange={v => onChange('critical_threshold', v)} />
         <div>
-          <label className="block text-xs text-slate-500 mb-1">Evaluation period</label>
+          <label className="block text-xs text-text-secondary mb-1">Evaluation period</label>
           <div className="flex gap-2">
             {[7, 14, 30].map(d => (
               <button
@@ -172,8 +172,8 @@ function AlertSection({
                 onClick={() => onChange('period_days', d)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
                   config.period_days === d
-                    ? 'bg-[#0D9488] text-white border-[#0D9488]'
-                    : 'bg-white text-slate-500 border-slate-200 hover:border-teal-300'
+                    ? 'bg-accent-primary text-text-on-brand border-accent-primary'
+                    : 'bg-surface-card text-text-secondary border-border-default hover:border-accent-primary'
                 }`}
               >
                 {d}d
@@ -196,13 +196,13 @@ function AlertSection({
 function NumField({ label, value, onChange }: { label: string; value: number; onChange: (v: number) => void }) {
   return (
     <div>
-      <label className="block text-xs text-slate-500 mb-1">{label}</label>
+      <label className="block text-xs text-text-secondary mb-1">{label}</label>
       <input
         type="number"
         value={value}
         onChange={e => onChange(parseFloat(e.target.value) || 0)}
         step="0.1"
-        className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm text-slate-700 focus:outline-none focus:ring-1 focus:ring-teal-500"
+        className="w-full border border-border-default rounded-lg px-3 py-1.5 text-sm bg-surface-card text-text-primary focus:outline-none focus:ring-1 focus:ring-accent-primary"
       />
     </div>
   )

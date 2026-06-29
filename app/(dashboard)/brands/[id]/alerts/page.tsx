@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
-import Link from 'next/link'
 import AlertConfig, { ALERT_CONFIG_DEFAULTS } from '@/components/alerts/AlertConfig'
+import { PageHeader } from '@/components/ui/PageHeader'
 
 export default async function BrandAlertsPage({
   params,
@@ -31,17 +31,15 @@ export default async function BrandAlertsPage({
 
   return (
     <div className="p-6 max-w-2xl">
-      <div className="mb-6">
-        <p className="text-sm text-slate-400 mb-1">
-          <Link href="/settings" className="hover:text-slate-600">Brands</Link>
-          {' › '}
-          {brand.name}
-          {' › '}
-          Alert Config
-        </p>
-        <h1 className="text-2xl font-bold text-[#1E2761]">Alert Config — {brand.name}</h1>
-        <p className="text-sm text-slate-500 mt-1">Thresholds are checked after every sync.</p>
-      </div>
+      <PageHeader
+        title={`Alert Config — ${brand.name}`}
+        breadcrumb={[
+          { label: 'Brands', href: '/settings' },
+          { label: brand.name, href: `/brands/${id}` },
+        ]}
+        className="mb-2"
+      />
+      <p className="text-sm text-text-secondary mb-6">Thresholds are checked after every sync.</p>
       <AlertConfig
         brandId={id}
         initialConfig={initialConfig as Parameters<typeof AlertConfig>[0]['initialConfig']}

@@ -1,6 +1,9 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { DataTable } from '@/components/ui/DataTable'
+import { StatusBadge, BadgeColor } from '@/components/ui/StatusBadge'
+import { EmptyState } from '@/components/ui/EmptyState'
 
 interface TargetingRow {
   targeting: string
@@ -27,11 +30,6 @@ function fmt(n: number | null, prefix = '') {
   return `${prefix}${n.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`
 }
 
-function fmtPct(n: number | null) {
-  if (n === null || n === undefined) return '—'
-  return `${(n * 100).toFixed(1)}%`
-}
-
 function fmtAcos(n: number | null) {
   if (n === null || n === undefined) return '—'
   // ACOS might be stored as 0–1 or 0–100
@@ -39,18 +37,15 @@ function fmtAcos(n: number | null) {
   return `${v.toFixed(1)}%`
 }
 
-function matchBadge(type: string | null) {
-  if (!type) return null
-  const colors: Record<string, string> = {
-    Exact: 'bg-emerald-50 text-emerald-700',
-    Phrase: 'bg-blue-50 text-blue-700',
-    Broad: 'bg-amber-50 text-amber-700',
-    Auto: 'bg-slate-100 text-slate-600',
+function matchColor(type: string | null): BadgeColor {
+  if (!type) return 'slate'
+  const map: Record<string, BadgeColor> = {
+    Exact: 'green',
+    Phrase: 'blue',
+    Broad: 'amber',
+    Auto: 'slate',
   }
-  const cls = colors[type] ?? 'bg-slate-100 text-slate-600'
-  return (
-    <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${cls}`}>{type}</span>
-  )
+  return map[type] ?? 'slate'
 }
 
 interface Props { brandId: string }
@@ -106,15 +101,15 @@ export default function KeywordsClient({ brandId }: Props) {
   return (
     <div className="space-y-5">
       {/* Upload bar */}
-      <div className="flex items-center gap-3 bg-white border border-slate-200 rounded-xl px-4 py-3">
+      <div className="flex items-center gap-3 bg-surface-card border border-border-default rounded-xl px-4 py-3">
         <div className="flex-1">
-          <p className="text-sm font-medium text-slate-700">Upload Targeting Report</p>
-          <p className="text-xs text-slate-400">
+          <p className="text-sm font-medium text-text-primary">Upload Targeting Report</p>
+          <p className="text-xs text-text-muted">
             Advertising Console → Reports → SP → Targeting (.xlsx)
           </p>
         </div>
         {uploadMsg && (
-          <span className={`text-xs ${uploadMsg.startsWith('✓') ? 'text-emerald-600' : 'text-red-500'}`}>
+          <span className={`text-xs ${uploadMsg.startsWith('✓') ? 'text-data-positive' : 'text-data-negative'}`}>
             {uploadMsg}
           </span>
         )}
@@ -122,37 +117,37 @@ export default function KeywordsClient({ brandId }: Props) {
         <button
           onClick={() => fileRef.current?.click()}
           disabled={uploading}
-          className="px-4 py-1.5 bg-teal-500 hover:bg-teal-600 disabled:bg-slate-200 text-white text-sm font-medium rounded-lg transition-colors"
+          className="px-4 py-1.5 bg-accent-primary hover:bg-accent-primary-hover disabled:opacity-50 text-text-on-brand text-sm font-medium rounded-lg transition-colors"
         >
           {uploading ? 'Uploading…' : 'Upload'}
         </button>
       </div>
 
       {loading ? (
-        <div className="text-sm text-slate-400 py-8 text-center">Loading…</div>
+        <div className="text-sm text-text-muted py-8 text-center">Loading…</div>
       ) : !data?.topSpend?.length ? (
-        <div className="bg-white border border-slate-200 rounded-xl py-16 text-center">
-          <p className="text-2xl mb-2">🔍</p>
-          <p className="text-sm font-medium text-slate-600">No targeting data yet</p>
-          <p className="text-xs text-slate-400 mt-1">Upload a Targeting report above to get started</p>
-        </div>
+        <EmptyState
+          icon="🔍"
+          title="No targeting data yet"
+          description="Upload a Targeting report above to get started."
+        />
       ) : (
         <>
           {/* Tabs */}
-          <div className="flex gap-1 bg-slate-100 p-1 rounded-xl w-fit">
+          <div className="flex gap-1 bg-surface-raised p-1 rounded-xl w-fit">
             {tabs.map((t) => (
               <button
                 key={t.key}
                 onClick={() => setActiveTab(t.key)}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   activeTab === t.key
-                    ? 'bg-white text-slate-800 shadow-sm'
-                    : 'text-slate-500 hover:text-slate-700'
+                    ? 'bg-surface-card shadow-sm text-text-primary'
+                    : 'text-text-muted hover:text-text-secondary'
                 }`}
               >
                 {t.label}
                 {t.count ? (
-                  <span className="ml-1.5 text-xs text-slate-400">({t.count})</span>
+                  <span className="ml-1.5 text-xs text-text-muted">({t.count})</span>
                 ) : null}
               </button>
             ))}
@@ -162,7 +157,7 @@ export default function KeywordsClient({ brandId }: Props) {
           {activeTab === 'top' && <TargetingTable rows={data.topSpend} type="spend" />}
           {activeTab === 'wasted' && (
             <div className="space-y-2">
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-text-secondary">
                 Keywords with spend but zero orders — candidates for negative targeting.
               </p>
               <TargetingTable rows={data.wasted} type="wasted" />
@@ -170,7 +165,7 @@ export default function KeywordsClient({ brandId }: Props) {
           )}
           {activeTab === 'converters' && (
             <div className="space-y-2">
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-text-secondary">
                 Best converting keywords by ACOS (lowest first, minimum 1 order).
               </p>
               <TargetingTable rows={data.topConverters} type="converters" />
@@ -189,54 +184,55 @@ function TargetingTable({
   rows: TargetingRow[]
   type: 'spend' | 'wasted' | 'converters'
 }) {
-  if (!rows?.length) return <p className="text-sm text-slate-400 py-4">No data</p>
+  if (!rows?.length) return (
+    <EmptyState
+      icon="🔍"
+      title="No targeting data yet"
+      description="Upload a Targeting report above to get started."
+    />
+  )
 
   return (
-    <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-slate-100 bg-slate-50 text-xs text-slate-500 font-medium">
-              <th className="text-left px-4 py-2.5">Keyword / Target</th>
-              <th className="text-left px-3 py-2.5">Match</th>
-              <th className="text-right px-3 py-2.5">Spend</th>
-              <th className="text-right px-3 py-2.5">Sales</th>
-              <th className="text-right px-3 py-2.5">ACOS</th>
-              <th className="text-right px-3 py-2.5">RoAS</th>
-              <th className="text-right px-3 py-2.5">Orders</th>
-              <th className="text-right px-3 py-2.5">Clicks</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-50">
-            {rows.map((r, i) => {
-              const acosVal = r.acos ? (r.acos > 1 ? r.acos : r.acos * 100) : null
-              const acosColor =
-                acosVal === null ? '' : acosVal > 40 ? 'text-red-600' : acosVal > 25 ? 'text-amber-600' : 'text-emerald-600'
+    <DataTable headers={[
+      { label: 'Keyword / Target' },
+      { label: 'Match' },
+      { label: 'Spend', align: 'right' },
+      { label: 'Sales', align: 'right' },
+      { label: 'ACOS', align: 'right' },
+      { label: 'RoAS', align: 'right' },
+      { label: 'Orders', align: 'right' },
+      { label: 'Clicks', align: 'right' },
+    ]}>
+      {rows.map((r, i) => {
+        const acosVal = r.acos ? (r.acos > 1 ? r.acos : r.acos * 100) : null
+        const acosColor =
+          acosVal === null ? 'text-text-secondary' : acosVal > 40 ? 'text-data-negative' : acosVal > 25 ? 'text-data-amber' : 'text-data-positive'
 
-              return (
-                <tr key={i} className="hover:bg-slate-50 transition-colors">
-                  <td className="px-4 py-2.5 font-medium text-slate-800 max-w-[200px] truncate">
-                    {r.targeting ?? '—'}
-                  </td>
-                  <td className="px-3 py-2.5">{matchBadge(r.match_type)}</td>
-                  <td className="px-3 py-2.5 text-right text-slate-700">₹{fmt(r.spend)}</td>
-                  <td className="px-3 py-2.5 text-right text-slate-700">
-                    {r.sales ? `₹${fmt(r.sales)}` : <span className="text-red-500">₹0</span>}
-                  </td>
-                  <td className={`px-3 py-2.5 text-right font-medium ${acosColor}`}>
-                    {fmtAcos(r.acos)}
-                  </td>
-                  <td className="px-3 py-2.5 text-right text-slate-700">
-                    {r.roas ? `${r.roas.toFixed(1)}x` : '—'}
-                  </td>
-                  <td className="px-3 py-2.5 text-right text-slate-700">{r.orders ?? '—'}</td>
-                  <td className="px-3 py-2.5 text-right text-slate-700">{r.clicks ?? '—'}</td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
-      </div>
-    </div>
+        return (
+          <tr key={i} className="hover:bg-surface-raised transition-colors">
+            <td className="px-4 py-2.5 font-medium text-text-primary max-w-[200px] truncate">
+              {r.targeting ?? '—'}
+            </td>
+            <td className="px-3 py-2.5">
+              <StatusBadge label={r.match_type ?? '—'} color={matchColor(r.match_type)} />
+            </td>
+            <td className="px-4 py-2.5 text-right text-text-secondary tabular-nums">₹{fmt(r.spend)}</td>
+            <td className="px-4 py-2.5 text-right tabular-nums">
+              {r.sales
+                ? <span className="text-text-secondary">₹{fmt(r.sales)}</span>
+                : <span className="text-data-negative">₹0</span>}
+            </td>
+            <td className={`px-4 py-2.5 text-right font-medium tabular-nums ${acosColor}`}>
+              {fmtAcos(r.acos)}
+            </td>
+            <td className="px-4 py-2.5 text-right text-text-secondary tabular-nums">
+              {r.roas ? `${r.roas.toFixed(1)}x` : '—'}
+            </td>
+            <td className="px-4 py-2.5 text-right text-text-secondary tabular-nums">{r.orders ?? '—'}</td>
+            <td className="px-4 py-2.5 text-right text-text-secondary tabular-nums">{r.clicks ?? '—'}</td>
+          </tr>
+        )
+      })}
+    </DataTable>
   )
 }

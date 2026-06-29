@@ -1,5 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { PageHeader } from '@/components/ui/PageHeader'
+import { StatusBadge, BadgeColor } from '@/components/ui/StatusBadge'
+import { EmptyState } from '@/components/ui/EmptyState'
 
 interface AlertRow {
   id: string
@@ -11,6 +14,12 @@ interface AlertRow {
   resolved_at: string | null
   created_at: string
   brands: { id: string; name: string }
+}
+
+function severityColor(severity: string): BadgeColor {
+  if (severity === 'critical') return 'red'
+  if (severity === 'warning') return 'amber'
+  return 'blue'
 }
 
 export default async function AlertsPage() {
@@ -30,33 +39,34 @@ export default async function AlertsPage() {
 
   return (
     <div className="p-6 max-w-4xl">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-[#1E2761]">Alerts</h1>
-        <p className="text-sm text-slate-500 mt-1">
-          {unresolved.length} active · {resolved.length} resolved
-        </p>
-      </div>
+      <PageHeader title="Alerts" />
+
+      <p className="text-sm text-text-secondary -mt-4 mb-6">
+        {unresolved.length} active · {resolved.length} resolved
+      </p>
 
       {rows.length === 0 && (
-        <div className="bg-white border border-slate-200 rounded-2xl p-12 text-center text-slate-400">
-          No alerts yet. They fire after each sync when thresholds are breached.
-        </div>
+        <EmptyState
+          icon="🔔"
+          title="No alerts"
+          description="All clear — no active alerts."
+        />
       )}
 
       {unresolved.length > 0 && (
         <section className="mb-6">
-          <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3">Active</h2>
-          <div className="bg-white border border-slate-200 rounded-2xl divide-y divide-slate-100">
-            {unresolved.map(a => <AlertRow key={a.id} alert={a} />)}
+          <h2 className="text-xs font-semibold text-text-muted uppercase tracking-widest mb-3">Active</h2>
+          <div className="bg-surface-card border border-border-default rounded-2xl divide-y divide-border-subtle">
+            {unresolved.map(a => <AlertItem key={a.id} alert={a} severityColor={severityColor} />)}
           </div>
         </section>
       )}
 
       {resolved.length > 0 && (
         <section>
-          <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3">Resolved</h2>
-          <div className="bg-white border border-slate-200 rounded-2xl divide-y divide-slate-100 opacity-60">
-            {resolved.map(a => <AlertRow key={a.id} alert={a} />)}
+          <h2 className="text-xs font-semibold text-text-muted uppercase tracking-widest mb-3">Resolved</h2>
+          <div className="bg-surface-card border border-border-default rounded-2xl divide-y divide-border-subtle opacity-60">
+            {resolved.map(a => <AlertItem key={a.id} alert={a} severityColor={severityColor} />)}
           </div>
         </section>
       )}
@@ -64,7 +74,7 @@ export default async function AlertsPage() {
   )
 }
 
-function AlertRow({ alert }: { alert: AlertRow }) {
+function AlertItem({ alert, severityColor }: { alert: AlertRow; severityColor: (s: string) => BadgeColor }) {
   const createdAt = new Date(alert.created_at).toLocaleString('en-IN', {
     day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit',
   })
@@ -75,18 +85,13 @@ function AlertRow({ alert }: { alert: AlertRow }) {
         {alert.severity === 'critical' ? '🚨' : '⚠️'}
       </span>
       <div className="flex-1 min-w-0">
-        <p className="text-sm text-slate-800 leading-snug">{alert.message}</p>
-        <p className="text-xs text-slate-400 mt-0.5">{alert.brands?.name} · {createdAt}</p>
+        <p className="text-sm text-text-primary leading-snug">{alert.message}</p>
+        <p className="text-xs text-text-muted mt-0.5">{alert.brands?.name} · {createdAt}</p>
       </div>
-      <span className={`flex-shrink-0 text-xs font-medium px-2 py-0.5 rounded-full ${
-        alert.resolved_at
-          ? 'bg-slate-100 text-slate-400'
-          : alert.severity === 'critical'
-            ? 'bg-red-100 text-red-700'
-            : 'bg-amber-100 text-amber-700'
-      }`}>
-        {alert.resolved_at ? 'resolved' : alert.severity}
-      </span>
+      {alert.resolved_at
+        ? <StatusBadge label="resolved" color="slate" size="md" />
+        : <StatusBadge label={alert.severity} color={severityColor(alert.severity)} size="md" />
+      }
     </div>
   )
 }

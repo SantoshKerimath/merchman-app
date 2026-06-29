@@ -55,29 +55,29 @@ export default function AlertToast() {
           key={alert.id}
           className={`rounded-xl border shadow-lg p-4 text-sm transition-all ${
             alert.severity === 'critical'
-              ? 'bg-red-50 border-red-200'
-              : 'bg-amber-50 border-amber-200'
+              ? 'bg-data-negative/5 border-data-negative/20'
+              : 'bg-data-amber/5 border-data-amber/20'
           }`}
           style={{ opacity: 1 - i * 0.12 }}
         >
           <p className={`font-medium mb-2 leading-snug ${
-            alert.severity === 'critical' ? 'text-red-800' : 'text-amber-800'
+            alert.severity === 'critical' ? 'text-data-negative' : 'text-data-amber'
           }`}>
             {alert.message}
           </p>
           <div className="flex gap-2">
             <button
               onClick={() => dismiss(alert.id)}
-              className="flex-1 text-xs font-medium py-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors"
+              className="flex-1 text-xs font-medium py-1.5 rounded-lg bg-surface-card border border-border-default text-text-secondary hover:bg-surface-raised transition-colors"
             >
               Ignore
             </button>
             <button
               onClick={() => act(alert)}
-              className={`flex-1 text-xs font-medium py-1.5 rounded-lg text-white transition-colors ${
+              className={`flex-1 text-xs font-medium py-1.5 rounded-lg text-text-on-brand transition-colors ${
                 alert.severity === 'critical'
-                  ? 'bg-red-600 hover:bg-red-700'
-                  : 'bg-amber-500 hover:bg-amber-600'
+                  ? 'bg-data-negative hover:opacity-90'
+                  : 'bg-data-amber hover:opacity-90'
               }`}
             >
               Act →
@@ -86,7 +86,7 @@ export default function AlertToast() {
         </div>
       ))}
       {queue.length > 3 && (
-        <p className="text-xs text-center text-slate-400">+{queue.length - 3} more alerts</p>
+        <p className="text-xs text-center text-text-muted">+{queue.length - 3} more alerts</p>
       )}
     </div>
   )
