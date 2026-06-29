@@ -4,6 +4,11 @@ import Link from 'next/link'
 import { formatINR, formatPercent } from '@/lib/pl-engine/compute'
 import SortBar from '@/components/dashboard/SortBar'
 import PinButton from '@/components/dashboard/PinButton'
+import { KpiCard } from '@/components/ui/KpiCard'
+import { PageHeader } from '@/components/ui/PageHeader'
+import { SectionCard } from '@/components/ui/SectionCard'
+import { EmptyState } from '@/components/ui/EmptyState'
+import { StatusBadge } from '@/components/ui/StatusBadge'
 
 const n = (v: number | null | undefined) => v ?? 0
 
@@ -92,58 +97,46 @@ export default async function CommandCenterPage({
     return sortVal(b) - sortVal(a)
   })
 
-  const portfolioCards = [
-    { label: 'Total Sales', value: formatINR(portSales) },
-    { label: 'Net Revenue', value: formatINR(portNetRevenue) },
-    { label: 'PPC Spend', value: portPpcSpend > 0 ? formatINR(portPpcSpend) : '—' },
-    { label: 'Blended ACOS', value: portAcos !== null ? formatPercent(portAcos) : '—' },
-    { label: 'Net after Ads', value: formatINR(portNetAfterAds) },
-  ]
-
   return (
     <div className="p-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-[#1E2761]">Command Center</h1>
-          <p className="text-sm text-slate-500 mt-1">All brands at a glance</p>
-        </div>
-        <Link
-          href="/settings"
-          className="text-sm bg-[#0D9488] text-white font-semibold px-4 py-2 rounded-lg hover:bg-teal-700 transition-colors"
-        >
-          + Add brand
-        </Link>
-      </div>
+      <PageHeader
+        title="Command Center"
+        actions={
+          <Link
+            href="/settings"
+            className="text-sm bg-accent-primary text-text-on-brand font-semibold px-4 py-2 rounded-lg hover:bg-accent-primary-hover transition-colors"
+          >
+            + Add brand
+          </Link>
+        }
+      />
 
       {/* Empty state */}
       {(!brands || brands.length === 0) && (
-        <div className="bg-white border border-slate-200 rounded-2xl p-12 text-center">
-          <div className="text-4xl mb-4">🏪</div>
-          <h2 className="text-lg font-semibold text-slate-700 mb-2">No brands yet</h2>
-          <p className="text-sm text-slate-500 mb-6">Add your first brand to start tracking revenue.</p>
-          <Link
-            href="/settings"
-            className="inline-block bg-[#0D9488] text-white text-sm font-semibold px-5 py-2.5 rounded-lg hover:bg-teal-700 transition-colors"
-          >
-            Add brand
-          </Link>
-        </div>
+        <SectionCard>
+          <EmptyState
+            icon="🏪"
+            title="No brands yet"
+            description="Add your first brand in Settings."
+            action={{ label: 'Go to Settings', href: '/settings' }}
+          />
+        </SectionCard>
       )}
 
       {sorted.length > 0 && (
         <>
           {/* Portfolio strip */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-5">
-            {portfolioCards.map(k => (
-              <div
-                key={k.label}
-                className="rounded-xl p-3 border bg-[#1E2761] border-[#1E2761] text-white"
-              >
-                <p className="text-xs font-medium mb-1 text-white/60">{k.label}</p>
-                <p className="text-base font-bold text-white">{k.value}</p>
-              </div>
-            ))}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+            <KpiCard label="Total Sales" value={formatINR(portSales)} sub="All brands" />
+            <KpiCard label="Net Revenue" value={formatINR(portNetRevenue)} />
+            <KpiCard label="PPC Spend" value={portPpcSpend > 0 ? formatINR(portPpcSpend) : '—'} />
+            <KpiCard
+              label="Blended ACOS"
+              value={portAcos !== null ? formatPercent(portAcos) : '—'}
+              variant={portAcos !== null && portAcos > 0.3 ? 'warning' : 'positive'}
+            />
+            <KpiCard label="Net after Ads" value={formatINR(portNetAfterAds)} />
           </div>
 
           {/* Sort bar */}
@@ -152,9 +145,10 @@ export default async function CommandCenterPage({
           {/* Brand list */}
           <div className="grid gap-3 mt-3">
             {sorted.map(({ brand, totalSales, netRevenue, ppcSpend, acos, hasData, hasCogs, hasHighAcos, rows }) => (
-              <div
+              <SectionCard
                 key={brand.id}
-                className="relative bg-white border border-slate-200 rounded-xl hover:border-teal-300 hover:shadow-sm transition-all"
+                padding="sm"
+                className="relative hover:border-accent-primary hover:shadow-sm transition-all"
               >
                 <PinButton brandId={brand.id} isPinned={brand.is_pinned ?? false} />
                 <Link
@@ -163,19 +157,15 @@ export default async function CommandCenterPage({
                 >
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="font-semibold text-slate-800">{brand.name}</h3>
+                      <h3 className="font-semibold text-text-primary">{brand.name}</h3>
                       {hasHighAcos && (
-                        <span className="text-xs bg-red-50 text-red-500 font-medium px-2 py-0.5 rounded-full border border-red-100">
-                          ⚠ High ACOS
-                        </span>
+                        <StatusBadge label="⚠ High ACOS" color="red" size="sm" />
                       )}
                       {hasData && !hasCogs && (
-                        <span className="text-xs bg-amber-50 text-amber-600 font-medium px-2 py-0.5 rounded-full border border-amber-100">
-                          No COGS
-                        </span>
+                        <StatusBadge label="No COGS" color="amber" size="sm" />
                       )}
                     </div>
-                    <p className="text-xs text-slate-400 mt-0.5">
+                    <p className="text-xs text-text-muted mt-0.5">
                       {hasData
                         ? `${rows.toLocaleString()} transactions`
                         : 'No data — upload settlement file'}
@@ -184,46 +174,44 @@ export default async function CommandCenterPage({
 
                   <div className="flex items-center gap-6 text-right">
                     <div>
-                      <p className="text-xs text-slate-400">Total Sales</p>
-                      <p className="text-sm font-semibold text-slate-700">
+                      <p className="text-xs text-text-muted">Total Sales</p>
+                      <p className="text-sm font-semibold text-text-secondary">
                         {hasData ? formatINR(totalSales) : '—'}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-slate-400">Net Revenue</p>
+                      <p className="text-xs text-text-muted">Net Revenue</p>
                       <p className={`text-sm font-semibold ${
-                        !hasData ? 'text-slate-400' : netRevenue >= 0 ? 'text-teal-600' : 'text-red-500'
+                        !hasData ? 'text-text-muted' : netRevenue >= 0 ? 'text-data-positive' : 'text-data-negative'
                       }`}>
                         {hasData ? formatINR(netRevenue) : '—'}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-slate-400">PPC Spend</p>
-                      <p className="text-sm font-semibold text-slate-700">
+                      <p className="text-xs text-text-muted">PPC Spend</p>
+                      <p className="text-sm font-semibold text-text-secondary">
                         {ppcSpend > 0 ? formatINR(ppcSpend) : '—'}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-slate-400">ACOS</p>
+                      <p className="text-xs text-text-muted">ACOS</p>
                       <p className={`text-sm font-semibold ${
                         acos === null
-                          ? 'text-slate-400'
+                          ? 'text-text-muted'
                           : acos > 0.30
-                          ? 'text-red-500'
-                          : 'text-teal-600'
+                          ? 'text-data-negative'
+                          : 'text-data-positive'
                       }`}>
                         {acos !== null ? formatPercent(acos) : '—'}
                       </p>
                     </div>
                     {!hasData && (
-                      <span className="text-xs bg-amber-50 text-amber-600 font-medium px-2.5 py-1 rounded-full">
-                        Upload data
-                      </span>
+                      <StatusBadge label="Upload data" color="amber" size="md" />
                     )}
-                    <span className="text-slate-300">›</span>
+                    <span className="text-text-muted">›</span>
                   </div>
                 </Link>
-              </div>
+              </SectionCard>
             ))}
           </div>
         </>

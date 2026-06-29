@@ -22,15 +22,15 @@ export default function SortBar({ currentSort }: Props) {
 
   return (
     <div className="flex items-center gap-2">
-      <span className="text-xs text-slate-400 font-medium mr-1">Sort:</span>
+      <span className="text-xs text-text-muted font-medium mr-1">Sort:</span>
       {SORTS.map(s => (
         <button
           key={s.key}
           onClick={() => setSort(s.key)}
           className={`text-xs font-medium px-3 py-1.5 rounded-lg border transition-colors ${
             currentSort === s.key
-              ? 'bg-[#0D9488] text-white border-[#0D9488]'
-              : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'
+              ? 'bg-accent-primary text-text-on-brand border-accent-primary'
+              : 'bg-surface-card text-text-secondary border-border-default hover:border-accent-primary'
           }`}
         >
           {s.label}
