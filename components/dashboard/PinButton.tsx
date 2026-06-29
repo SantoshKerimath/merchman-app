@@ -38,7 +38,7 @@ export default function PinButton({ brandId, isPinned }: Props) {
           ? 'text-red-400'
           : pinned
           ? 'text-amber-400 hover:text-amber-500'
-          : 'text-slate-200 hover:text-slate-400'
+          : 'text-text-muted hover:text-text-secondary'
       }`}
     >
       📌

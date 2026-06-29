@@ -21,10 +21,10 @@ export default async function KeywordsPage({ params }: Props) {
   return (
     <div className="p-6 max-w-7xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-800">
+        <h1 className="text-2xl font-bold text-text-primary">
           {brand?.name ?? 'Brand'} — Keyword Analytics
         </h1>
-        <p className="text-sm text-slate-500 mt-1">
+        <p className="text-sm text-text-muted mt-1">
           Upload a Sponsored Products Targeting report to analyse keyword performance.
         </p>
       </div>

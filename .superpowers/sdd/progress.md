@@ -1,17 +1,14 @@
-# Day 8 SDD Progress — SP-API Infrastructure + Multi-Report Parsers
-# Branch base: 96cd23c (feat(dashboard): Day 7 command center polish)
-# Plan: docs/superpowers/plans/2026-06-22-day8-spapi-parsers.md
+# Design System SDD Progress
+# Branch base: 220a9c0 (docs: design system implementation plan)
+# Plan: docs/superpowers/plans/2026-06-29-design-system.md
 
-Task 1: complete (types/database.ts regenerated — brand_credentials, sync_logs, business_metrics + RLS, tsc clean, review clean)
-Task 2: complete (vitest.config.ts + scaffold test + package.json scripts — npm install needs user terminal, review clean)
-Task 3: complete (settlement-v2.ts + 5 tests — total accumulation fix applied, review clean)
-Task 4: complete (advertising-campaign.ts + 5 tests — CSV quoting fix applied, review clean)
-Task 5: complete (business-report.ts + 4 tests — DD/MM/YY, percentage, currency parsing, review clean)
-Task 6: complete (lwa.ts, sp-api.ts, reports.ts — sandbox fixtures, SyncTimeoutError, review clean)
-Task 7: complete (auth/route.ts + callback/route.ts — error redirect fixes, review clean)
-Task 8: complete (sync/route.ts — ppc date-range delete fix, review clean)
-Task 9: complete (credentials/route.ts — PATCH sync_schedule + DELETE disconnect, review inline clean)
-Task 10: complete (SyncControls.tsx, ScheduleConfig.tsx, DisconnectButton.tsx, settings/page.tsx — sandbox banner, OAuth success/error, review inline clean)
-Task 11: complete (SessionsConversionChart.tsx + brand page gear icon + bizMetrics query, review inline clean)
-Task 12: complete (AGENTS.md + docs/04_project_plan.md Day 8 marked complete, review inline clean)
---- ALL 12 TASKS COMPLETE ---
+Task 1: complete (commits 220a9c0..20ff4e6, review clean, minor: font-mono falls back to system mono — acceptable)
+Task 2: complete (commits 20ff4e6..5d1691d, review clean)
+Task 3: complete (commits 5d1691d..4bc930f, review clean)
+Task 4: complete (commits 4bc930f..86ec47d, review clean)
+Task 5: complete (commits 86ec47d..a337379, review clean)
+Task 6: complete (commits a337379..85e8612, review clean — sandbox commit succeeded, hook + all 5 charts migrated)
+Task 7: complete (commits 85e8612..1b2d75e, review clean — SortBar hover fixed to accent-primary, EmptyState copy aligned to spec)
+Task 8: complete (commits 1b2d75e..e1ed774, review clean after fix — text-red-500→data-negative, hover affordance restored)
+Task 9: complete (commits e1ed774..0856662, review approved — bg-data-negative valid via --color-data-negative utility)
+Task 10: complete (commits 0856662..9054e5d, review approved — all 8 files clean)
