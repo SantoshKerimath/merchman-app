@@ -66,33 +66,33 @@ export default function ProductsCOGSTable({ brandId, initialProducts }: Props) {
 
   if (products.length === 0) {
     return (
-      <div className="bg-white border border-slate-200 rounded-xl mt-4 px-5 py-8 text-center text-sm text-slate-400">
+      <div className="bg-surface-card border border-border-default rounded-xl mt-4 px-5 py-8 text-center text-sm text-text-muted">
         No SKUs found. Upload settlement data first.
       </div>
     )
   }
 
   return (
-    <div className="bg-white border border-slate-200 rounded-xl mt-4">
+    <div className="bg-surface-card border border-border-default rounded-xl mt-4">
       {/* Header */}
       <button
         className="w-full flex items-center justify-between px-5 py-3 text-left"
         onClick={() => setOpen(o => !o)}
       >
-        <span className="text-sm font-semibold text-slate-700">
+        <span className="text-sm font-semibold text-text-primary">
           Products &amp; COGS
-          <span className="ml-2 text-xs font-normal text-slate-400">
+          <span className="ml-2 text-xs font-normal text-text-muted">
             {products.length} SKUs
           </span>
         </span>
-        <span className="text-slate-400 text-xs">{open ? '▲' : '▼'}</span>
+        <span className="text-text-muted text-xs">{open ? '▲' : '▼'}</span>
       </button>
 
       {open && (
-        <div className="overflow-x-auto border-t border-slate-100">
+        <div className="overflow-x-auto border-t border-border-subtle">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-xs text-slate-400 border-b border-slate-100">
+              <tr className="text-xs text-text-muted border-b border-border-subtle">
                 <th className="px-5 py-2 text-left font-medium">SKU</th>
                 <th className="px-5 py-2 text-right font-medium">Units Sold</th>
                 <th className="px-5 py-2 text-right font-medium">Revenue</th>
@@ -109,11 +109,11 @@ export default function ProductsCOGSTable({ brandId, initialProducts }: Props) {
                 return (
                   <tr
                     key={p.sku}
-                    className="border-b border-slate-50 last:border-0"
+                    className="border-b border-border-subtle last:border-0"
                   >
-                    <td className="px-5 py-2.5 font-mono text-xs text-slate-600">{p.sku}</td>
-                    <td className="px-5 py-2.5 text-right text-slate-600">{p.units_sold.toLocaleString()}</td>
-                    <td className="px-5 py-2.5 text-right text-slate-600">{formatINR(p.product_sales)}</td>
+                    <td className="px-5 py-2.5 font-mono text-xs text-text-secondary">{p.sku}</td>
+                    <td className="px-5 py-2.5 text-right text-text-secondary">{p.units_sold.toLocaleString()}</td>
+                    <td className="px-5 py-2.5 text-right text-text-secondary">{formatINR(p.product_sales)}</td>
                     <td className="px-5 py-2.5 text-right">
                       {editingSku === p.sku ? (
                         <input
@@ -122,7 +122,7 @@ export default function ProductsCOGSTable({ brandId, initialProducts }: Props) {
                           max={99999}
                           value={editValue}
                           autoFocus
-                          className="w-24 text-right border border-teal-400 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-teal-500"
+                          className="w-24 text-right border border-border-default rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-accent-primary bg-surface-card text-text-primary"
                           onChange={e => setEditValue(e.target.value)}
                           onBlur={() => saveCogs(p.sku, editValue)}
                           onKeyDown={e => {
@@ -137,19 +137,19 @@ export default function ProductsCOGSTable({ brandId, initialProducts }: Props) {
                             savingSku === p.sku ? 'opacity-50' : ''
                           }`}
                         >
-                          <span className="text-slate-500">
+                          <span className="text-text-secondary">
                             {p.cogs ? formatINR(p.cogs) : '—'}
                           </span>
-                          <span className="text-slate-300 opacity-0 group-hover:opacity-100 text-xs">✏</span>
+                          <span className="text-text-muted opacity-0 group-hover:opacity-100 text-xs">✏</span>
                         </button>
                       )}
                       {errors[p.sku] && (
-                        <p className="text-xs text-red-500 mt-0.5">{errors[p.sku]}</p>
+                        <p className="text-xs text-data-negative mt-0.5">{errors[p.sku]}</p>
                       )}
                     </td>
                     <td className={`px-5 py-2.5 text-right font-medium ${
-                      netProfit === null ? 'text-slate-300' :
-                      netProfit >= 0 ? 'text-teal-600' : 'text-red-500'
+                      netProfit === null ? 'text-text-muted' :
+                      netProfit >= 0 ? 'text-data-positive' : 'text-data-negative'
                     }`}>
                       {netProfit === null ? '—' : formatINR(netProfit)}
                     </td>

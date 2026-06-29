@@ -16,6 +16,10 @@ import OrganicVsPPCChart from '@/components/charts/OrganicVsPPCChart'
 import ACOSTrendChart from '@/components/charts/ACOSTrendChart'
 import SpendVsSalesChart from '@/components/charts/SpendVsSalesChart'
 import SessionsConversionChart from '@/components/charts/SessionsConversionChart'
+import { PageHeader } from '@/components/ui/PageHeader'
+import { KpiCard } from '@/components/ui/KpiCard'
+import { SectionCard } from '@/components/ui/SectionCard'
+import { EmptyState } from '@/components/ui/EmptyState'
 
 function isoWeek(dateStr: string): string {
   const d = new Date(dateStr + 'T00:00:00')
@@ -189,59 +193,29 @@ export default async function BrandPage({
     netProfit: row.cogs !== null ? row.grossProfit - row.cogs * row.units : null,
   }))
 
-  // --- P&L KPI strip ---
-  const plKpis = [
-    {
-      label: 'Total Sales',
-      value: formatINR(totalSales),
-      sub: `${totalRows.toLocaleString()} transactions`,
-    },
-    { label: 'FBA Fees', value: formatINR(totalFBA), sub: 'Fulfilment cost' },
-    { label: 'Referral Fees', value: formatINR(totalFees), sub: 'Selling fees' },
-    { label: 'TCS + TDS', value: formatINR(totalTCS + totalTDS), sub: 'Tax deductions' },
-    {
-      label: 'Net Revenue',
-      value: formatINR(grossProfit),
-      sub: formatPercent(grossMargin) + ' of sales',
-    },
-    {
-      label: 'Contribution Margin',
-      value: hasAnyCogs || hasPPC ? formatINR(netProfit) : '—',
-      sub:
-        hasFullCogs && hasPPC
-          ? formatPercent(netMargin) + ' of sales'
-          : 'Enter COGS to unlock',
-    },
-  ]
-
   return (
     <div className="p-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <p className="text-sm text-slate-400">
-            <Link href="/dashboard" className="hover:text-slate-600">
-              Command Center
-            </Link>{' '}
-            › {brand.name}
-          </p>
-          <h1 className="text-2xl font-bold text-[#1E2761] mt-0.5">{brand.name}</h1>
-        </div>
-        <div className="flex items-center gap-2">
-          <Link
-            href={`/brands/${id}/keywords`}
-            className="text-sm border border-slate-200 text-slate-600 font-medium px-4 py-2 rounded-lg hover:bg-slate-50 transition-colors"
-          >
-            🔍 Keywords
-          </Link>
-          <Link
-            href={`/brands/${id}/upload`}
-            className="text-sm bg-[#0D9488] text-white font-semibold px-4 py-2 rounded-lg hover:bg-teal-700 transition-colors"
-          >
-            + Upload data
-          </Link>
-        </div>
-      </div>
+      <PageHeader
+        title={brand.name}
+        breadcrumb={[{ label: 'Command Center', href: '/dashboard' }]}
+        actions={
+          <>
+            <Link
+              href={`/brands/${id}/keywords`}
+              className="text-sm border border-border-default text-text-secondary font-medium px-4 py-2 rounded-lg hover:bg-surface-raised transition-colors"
+            >
+              Keywords
+            </Link>
+            <Link
+              href={`/brands/${id}/upload`}
+              className="text-sm bg-accent-primary hover:bg-accent-primary-hover text-text-on-brand font-semibold px-4 py-2 rounded-lg transition-colors"
+            >
+              + Upload data
+            </Link>
+          </>
+        }
+      />
 
       {/* Date filter */}
       <DateFilterBar
@@ -252,35 +226,23 @@ export default async function BrandPage({
 
       {/* No data state — distinguish "no uploads" vs "date range empty" */}
       {totalRows === 0 && (from || to) && (
-        <div className="bg-white border border-slate-200 rounded-2xl p-12 text-center mt-4">
-          <div className="text-4xl mb-4">🔍</div>
-          <h2 className="text-lg font-semibold text-slate-700 mb-2">No data in this date range</h2>
-          <p className="text-sm text-slate-500 mb-6">
-            Try a wider range or view all-time data.
-          </p>
-          <Link
-            href={`/brands/${id}`}
-            className="inline-block bg-[#1E2761] text-white text-sm font-semibold px-5 py-2.5 rounded-lg hover:opacity-90 transition-opacity"
-          >
-            View all time
-          </Link>
-        </div>
+        <SectionCard padding="lg" className="mt-4">
+          <EmptyState
+            title="No data in this date range"
+            description="Try a wider range or view all-time data."
+            action={{ label: 'View all time', href: `/brands/${id}` }}
+          />
+        </SectionCard>
       )}
 
       {totalRows === 0 && !from && !to && (
-        <div className="bg-white border border-slate-200 rounded-2xl p-12 text-center mt-4">
-          <div className="text-4xl mb-4">📂</div>
-          <h2 className="text-lg font-semibold text-slate-700 mb-2">No data yet</h2>
-          <p className="text-sm text-slate-500 mb-6">
-            Upload your Amazon settlement file to see P&amp;L.
-          </p>
-          <Link
-            href={`/brands/${id}/upload`}
-            className="inline-block bg-[#0D9488] text-white text-sm font-semibold px-5 py-2.5 rounded-lg hover:bg-teal-700 transition-colors"
-          >
-            Upload settlement data
-          </Link>
-        </div>
+        <SectionCard padding="lg" className="mt-4">
+          <EmptyState
+            title="No data yet"
+            description="Upload your Amazon settlement file to see P&L."
+            action={{ label: 'Upload settlement data', href: `/brands/${id}/upload` }}
+          />
+        </SectionCard>
       )}
 
       {totalRows > 0 && (
@@ -298,26 +260,34 @@ export default async function BrandPage({
 
           {/* 2. P&L strip */}
           <div className="grid grid-cols-2 md:grid-cols-6 gap-3 mb-4">
-            {plKpis.map(k => (
-              <div
-                key={k.label}
-                className="rounded-xl p-3 border bg-[#1E2761] border-[#1E2761] text-white"
-              >
-                <p className="text-xs font-medium mb-1 text-white/60">{k.label}</p>
-                <p className="text-base font-bold text-white">{k.value}</p>
-                <p className="text-xs mt-0.5 text-white/50">{k.sub}</p>
-              </div>
-            ))}
+            <KpiCard label="Total Sales" value={formatINR(totalSales)} sub={`${totalRows.toLocaleString()} transactions`} />
+            <KpiCard label="FBA Fees" value={formatINR(totalFBA)} sub="Fulfilment cost" variant="negative" />
+            <KpiCard label="Referral Fees" value={formatINR(totalFees)} sub="Selling fees" variant="negative" />
+            <KpiCard label="TCS + TDS" value={formatINR(totalTCS + totalTDS)} sub="Tax deductions" variant="negative" />
+            <KpiCard
+              label="Net Revenue"
+              value={formatINR(grossProfit)}
+              sub={formatPercent(grossMargin) + ' of sales'}
+              variant={grossProfit >= 0 ? 'positive' : 'negative'}
+            />
+            <KpiCard
+              label="Contribution Margin"
+              value={hasAnyCogs || hasPPC ? formatINR(netProfit) : '—'}
+              sub={hasFullCogs && hasPPC ? formatPercent(netMargin) + ' of sales' : 'Enter COGS to unlock'}
+              variant={hasAnyCogs || hasPPC ? (netProfit >= 0 ? 'positive' : 'negative') : 'default'}
+            />
           </div>
 
           {/* 3. Charts grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <DailySalesChart data={dailySalesData} />
-            <OrganicVsPPCChart data={weeklyPPCData} hasPPC={hasPPC} />
-            <ACOSTrendChart data={weeklyPPCData} hasPPC={hasPPC} />
-            <SpendVsSalesChart data={weeklyPPCData} hasPPC={hasPPC} />
-            <SessionsConversionChart data={bizMetrics ?? []} />
-          </div>
+          <SectionCard title="Performance" padding="lg" className="mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <DailySalesChart data={dailySalesData} />
+              <OrganicVsPPCChart data={weeklyPPCData} hasPPC={hasPPC} />
+              <ACOSTrendChart data={weeklyPPCData} hasPPC={hasPPC} />
+              <SpendVsSalesChart data={weeklyPPCData} hasPPC={hasPPC} />
+              <SessionsConversionChart data={bizMetrics ?? []} />
+            </div>
+          </SectionCard>
 
           {/* 4. Product breakdown (with inline COGS editing) */}
           <ProductTable data={productTableData} brandId={id} />

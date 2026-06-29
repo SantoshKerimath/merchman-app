@@ -110,27 +110,28 @@ export default function ProductTable({ data, brandId }: Props) {
 
   if (data.length === 0) {
     return (
-      <div className="bg-white border border-slate-200 rounded-xl p-6 text-center mb-4">
-        <p className="text-sm text-slate-400">No transactions in this period</p>
+      <div className="bg-surface-card border border-border-default rounded-xl p-6 text-center mb-4">
+        <p className="text-sm text-text-muted">No transactions in this period</p>
       </div>
     )
   }
 
   function SortIcon({ col }: { col: SortKey }) {
-    if (!sort || sort.key !== col) return <span className="text-slate-300 ml-1">↕</span>
-    return <span className="text-[#0D9488] ml-1">{sort.dir === 'desc' ? '↓' : '↑'}</span>
+    if (!sort || sort.key !== col) return <span className="text-text-muted ml-1">↕</span>
+    return <span className="text-accent-primary ml-1">{sort.dir === 'desc' ? '↓' : '↑'}</span>
   }
 
   return (
-    <div className="bg-white border border-slate-200 rounded-xl overflow-hidden mb-4">
-      <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
-        <p className="text-sm font-semibold text-[#1E2761]">Product Breakdown</p>
+    <div className="bg-surface-card border border-border-default rounded-xl overflow-hidden mb-4">
+      <div className="px-4 py-3 border-b border-border-subtle flex items-center justify-between">
+        <p className="text-sm font-semibold text-text-primary">Product Breakdown</p>
         <button
           onClick={() => setShowCogs(v => !v)}
-          className="text-xs font-medium px-3 py-1.5 rounded-lg border transition-colors"
-          style={showCogs
-            ? { borderColor: '#0D9488', color: '#0D9488', background: '#f0fdfa' }
-            : { borderColor: '#e2e8f0', color: '#94a3b8', background: 'white' }}
+          className={`text-xs font-medium px-3 py-1.5 rounded-lg border transition-colors ${
+            showCogs
+              ? 'border-accent-primary text-accent-primary bg-accent-primary-subtle'
+              : 'border-border-default text-text-muted bg-surface-card'
+          }`}
         >
           {showCogs ? 'Hide cost analysis' : 'Show cost analysis'}
         </button>
@@ -138,12 +139,12 @@ export default function ProductTable({ data, brandId }: Props) {
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-slate-50 text-xs text-slate-500">
+            <tr className="bg-surface-raised text-xs text-text-muted">
               <th className="text-left px-4 py-2.5 font-medium">SKU</th>
               {BASE_COLS.map(c => (
                 <th
                   key={c.key}
-                  className="text-right px-4 py-2.5 font-medium cursor-pointer hover:text-slate-700 select-none"
+                  className="text-right px-4 py-2.5 font-medium cursor-pointer hover:text-text-primary select-none"
                   onClick={() => toggleSort(c.key)}
                 >
                   {c.label}
@@ -153,7 +154,7 @@ export default function ProductTable({ data, brandId }: Props) {
               {showCogs && COGS_COLS.map(c => (
                 <th
                   key={c.key}
-                  className="text-right px-4 py-2.5 font-medium cursor-pointer hover:text-slate-700 select-none text-teal-600"
+                  className="text-right px-4 py-2.5 font-medium cursor-pointer hover:text-text-primary select-none text-accent-primary"
                   onClick={() => toggleSort(c.key)}
                 >
                   {c.label}
@@ -164,8 +165,8 @@ export default function ProductTable({ data, brandId }: Props) {
           </thead>
           <tbody>
             {sorted.map(r => (
-              <tr key={r.sku} className="border-t border-slate-50 hover:bg-slate-50/50">
-                <td className="px-4 py-2.5 font-mono text-xs text-slate-600">{r.sku}</td>
+              <tr key={r.sku} className="border-t border-border-subtle hover:bg-surface-raised/50">
+                <td className="px-4 py-2.5 font-mono text-xs text-text-secondary">{r.sku}</td>
                 <td className="px-4 py-2.5 text-right">{formatINR(r.sales)}</td>
                 <td className="px-4 py-2.5 text-right">{r.units.toLocaleString()}</td>
                 <td className="px-4 py-2.5 text-right">{r.orders.toLocaleString()}</td>
@@ -181,7 +182,7 @@ export default function ProductTable({ data, brandId }: Props) {
                           max={99999}
                           value={editValue}
                           autoFocus
-                          className="w-24 text-right border border-teal-400 rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-teal-500"
+                          className="w-24 text-right border border-border-default rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-accent-primary bg-surface-card text-text-primary"
                           onChange={e => setEditValue(e.target.value)}
                           onBlur={() => saveCogs(r.sku, editValue)}
                           onKeyDown={e => {
@@ -199,23 +200,23 @@ export default function ProductTable({ data, brandId }: Props) {
                             savingSku === r.sku ? 'opacity-50' : ''
                           }`}
                         >
-                          <span className={r.cogs ? 'text-slate-700' : 'text-slate-300'}>
+                          <span className={r.cogs ? 'text-text-primary' : 'text-text-muted'}>
                             {r.cogs ? formatINR(r.cogs) : '—'}
                           </span>
-                          <span className="text-slate-300 opacity-0 group-hover:opacity-100 text-xs">✏</span>
+                          <span className="text-text-muted opacity-0 group-hover:opacity-100 text-xs">✏</span>
                         </button>
                       )}
                       {cogsErrors[r.sku] && (
-                        <p className="text-xs text-red-500 mt-0.5">{cogsErrors[r.sku]}</p>
+                        <p className="text-xs text-data-negative mt-0.5">{cogsErrors[r.sku]}</p>
                       )}
                     </td>
                     {/* Contribution Margin */}
                     <td className={`px-4 py-2.5 text-right font-medium ${
                       r.netProfit === null
-                        ? 'text-slate-300'
+                        ? 'text-text-muted'
                         : r.netProfit >= 0
-                        ? 'text-teal-600'
-                        : 'text-red-500'
+                        ? 'text-data-positive'
+                        : 'text-data-negative'
                     }`}>
                       {r.netProfit !== null ? formatINR(r.netProfit) : '—'}
                     </td>
@@ -225,21 +226,21 @@ export default function ProductTable({ data, brandId }: Props) {
             ))}
           </tbody>
           <tfoot>
-            <tr className="border-t-2 border-slate-200 bg-slate-50 font-semibold text-xs">
-              <td className="px-4 py-2.5 text-slate-600">Total</td>
+            <tr className="border-t-2 border-border-default bg-surface-raised font-semibold text-xs">
+              <td className="px-4 py-2.5 text-text-secondary">Total</td>
               <td className="px-4 py-2.5 text-right">{formatINR(totalSales)}</td>
               <td className="px-4 py-2.5 text-right">{totalUnits.toLocaleString()}</td>
               <td className="px-4 py-2.5 text-right">{totalOrders.toLocaleString()}</td>
               <td className="px-4 py-2.5 text-right">{formatINR(totalGP)}</td>
               {showCogs && (
                 <>
-                  <td className="px-4 py-2.5 text-right text-slate-300">—</td>
+                  <td className="px-4 py-2.5 text-right text-text-muted">—</td>
                   <td className={`px-4 py-2.5 text-right ${
                     totalNP === null
-                      ? 'text-slate-300'
+                      ? 'text-text-muted'
                       : totalNP >= 0
-                      ? 'text-teal-600'
-                      : 'text-red-500'
+                      ? 'text-data-positive'
+                      : 'text-data-negative'
                   }`}>
                     {totalNP !== null ? formatINR(totalNP) : '—'}
                   </td>

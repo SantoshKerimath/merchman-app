@@ -144,7 +144,7 @@ export default function DateFilterBar({ brandId, currentFrom, currentTo }: Props
   ]
 
   return (
-    <div className="bg-white border border-slate-200 rounded-xl p-3 mb-4 flex flex-wrap items-center gap-2">
+    <div className="bg-surface-card border border-border-default rounded-xl p-3 mb-4 flex flex-wrap items-center gap-2">
       {/* Presets */}
       <div className="flex items-center gap-1.5">
         {presets.map(p => (
@@ -153,8 +153,8 @@ export default function DateFilterBar({ brandId, currentFrom, currentTo }: Props
             onClick={() => applyPreset(p.id)}
             className={`text-xs font-medium px-3 py-1.5 rounded-lg border transition-colors ${
               p.id === 'all' && !currentFrom && !currentTo
-                ? 'bg-[#1E2761] border-[#1E2761] text-white'
-                : 'border-slate-200 text-slate-600 hover:border-slate-400'
+                ? 'bg-surface-sidebar text-text-on-brand border-surface-sidebar'
+                : 'bg-surface-card border-border-default text-text-secondary hover:border-accent-primary'
             }`}
           >
             {p.label}
@@ -162,7 +162,7 @@ export default function DateFilterBar({ brandId, currentFrom, currentTo }: Props
         ))}
         <button
           onClick={() => setShowCustom(v => !v)}
-          className="text-xs font-medium px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:border-slate-400 transition-colors"
+          className="text-xs font-medium px-3 py-1.5 rounded-lg border bg-surface-card border-border-default text-text-secondary hover:border-accent-primary transition-colors"
         >
           Custom ▾
         </button>
@@ -175,19 +175,19 @@ export default function DateFilterBar({ brandId, currentFrom, currentTo }: Props
             type="date"
             value={customFrom}
             onChange={e => setCustomFrom(e.target.value)}
-            className="text-xs border border-slate-200 rounded-lg px-2 py-1.5"
+            className="text-xs border border-border-default rounded-lg px-2 py-1.5 bg-surface-card text-text-primary focus:ring-accent-primary"
           />
-          <span className="text-xs text-slate-400">–</span>
+          <span className="text-xs text-text-muted">–</span>
           <input
             type="date"
             value={customTo}
             onChange={e => setCustomTo(e.target.value)}
-            className="text-xs border border-slate-200 rounded-lg px-2 py-1.5"
+            className="text-xs border border-border-default rounded-lg px-2 py-1.5 bg-surface-card text-text-primary focus:ring-accent-primary"
           />
           <button
             onClick={() => { if (customFrom && customTo) apply(customFrom, customTo) }}
             disabled={!customFrom || !customTo}
-            className="text-xs font-medium px-3 py-1.5 rounded-lg bg-[#0D9488] text-white disabled:opacity-40"
+            className="text-xs font-medium px-3 py-1.5 rounded-lg bg-accent-primary text-text-on-brand disabled:opacity-40"
           >
             Apply
           </button>
@@ -196,7 +196,7 @@ export default function DateFilterBar({ brandId, currentFrom, currentTo }: Props
 
       {/* Divider */}
       {(recent.length > 0 || saved.length > 0) && (
-        <div className="w-px h-5 bg-slate-200 mx-1" />
+        <div className="w-px h-5 bg-border-default mx-1" />
       )}
 
       {/* Recent chips */}
@@ -206,8 +206,8 @@ export default function DateFilterBar({ brandId, currentFrom, currentTo }: Props
           onClick={() => apply(entry.from, entry.to)}
           className={`text-xs px-2.5 py-1.5 rounded-lg border transition-colors ${
             isActive(entry.from, entry.to)
-              ? 'bg-[#1E2761] border-[#1E2761] text-white'
-              : 'border-slate-200 text-slate-500 hover:border-slate-400'
+              ? 'bg-surface-sidebar text-text-on-brand border-surface-sidebar'
+              : 'bg-surface-card border-border-default text-text-secondary hover:border-accent-primary'
           }`}
         >
           {entry.label}
@@ -220,8 +220,8 @@ export default function DateFilterBar({ brandId, currentFrom, currentTo }: Props
           key={i}
           className={`flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg border ${
             isActive(entry.from, entry.to)
-              ? 'bg-[#0D9488] border-[#0D9488] text-white'
-              : 'border-teal-200 text-teal-700 bg-teal-50'
+              ? 'bg-accent-primary border-accent-primary text-text-on-brand'
+              : 'bg-accent-primary-subtle border-accent-primary/20 text-accent-primary'
           }`}
         >
           <button onClick={() => apply(entry.from, entry.to)}>{entry.savedName}</button>
@@ -239,7 +239,7 @@ export default function DateFilterBar({ brandId, currentFrom, currentTo }: Props
         <button
           onClick={saveFilter}
           title="Save this filter"
-          className="ml-auto text-xs text-slate-400 hover:text-slate-600 transition-colors"
+          className="ml-auto text-xs text-text-muted hover:text-text-secondary transition-colors"
         >
           🔖
         </button>
