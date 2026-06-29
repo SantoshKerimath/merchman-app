@@ -56,23 +56,23 @@ export default function SyncControls({ brandId, isConnected, lastLogs }: Props) 
       {(['settlement', 'advertising', 'business'] as SyncType[]).map(type => {
         const log = logFor(type)
         return (
-          <div key={type} className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200">
+          <div key={type} className="flex items-center justify-between p-4 bg-surface-raised rounded-xl border border-border-default">
             <div>
-              <p className="text-sm font-medium text-slate-700">{SYNC_LABELS[type]}</p>
+              <p className="text-sm font-medium text-text-primary">{SYNC_LABELS[type]}</p>
               {log?.completed_at && (
-                <p className="text-xs text-slate-400 mt-0.5">
+                <p className="text-xs text-text-muted mt-0.5">
                   Last: {new Date(log.completed_at).toLocaleString('en-IN')}
                   {log.rows_inserted !== null && ` · ${log.rows_inserted} rows`}
                 </p>
               )}
               {results[type] && (
-                <p className="text-xs mt-0.5 text-slate-600">{results[type]}</p>
+                <p className="text-xs mt-0.5 text-text-secondary">{results[type]}</p>
               )}
             </div>
             <button
               onClick={() => handleSync(type)}
               disabled={!isConnected || syncing === type}
-              className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-[#0D9488] text-white hover:bg-teal-700 transition-colors disabled:opacity-40"
+              className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-accent-primary text-text-on-brand hover:bg-accent-primary-hover transition-colors disabled:opacity-40"
             >
               {syncing === type ? 'Syncing…' : 'Sync now'}
             </button>

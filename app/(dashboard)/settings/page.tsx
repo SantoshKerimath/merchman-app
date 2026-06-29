@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import { PageHeader } from '@/components/ui/PageHeader'
+import { SectionCard } from '@/components/ui/SectionCard'
 
 interface Brand { id: string; name: string; created_at: string; is_pinned: boolean; is_connected: boolean }
 
@@ -46,14 +48,11 @@ export default function SettingsPage() {
 
   return (
     <div className="p-6 max-w-2xl">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-[#1E2761]">Brands</h1>
-        <p className="text-sm text-slate-500 mt-1">Manage your brands and Amazon connections</p>
-      </div>
+      <PageHeader title="Brands" />
+      <p className="text-sm text-text-secondary -mt-4 mb-6">Manage your brands and Amazon connections</p>
 
       {/* Create brand */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-6 mb-6">
-        <h2 className="text-base font-semibold text-slate-800 mb-4">Add a brand</h2>
+      <SectionCard title="Add a brand" padding="lg" className="mb-6">
         <form onSubmit={handleCreate} className="flex gap-3">
           <input
             type="text"
@@ -61,41 +60,40 @@ export default function SettingsPage() {
             onChange={e => setName(e.target.value)}
             placeholder="e.g. Cadlec, Kridlo, TinyLane"
             required
-            className="flex-1 px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+            className="flex-1 px-3 py-2.5 border border-border-default bg-surface-card text-text-primary rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-primary"
           />
           <button
             type="submit"
             disabled={loading}
-            className="bg-[#0D9488] text-white text-sm font-semibold px-5 py-2.5 rounded-lg hover:bg-teal-700 transition-colors disabled:opacity-50"
+            className="bg-accent-primary text-text-on-brand text-sm font-semibold px-5 py-2.5 rounded-lg hover:bg-accent-primary-hover transition-colors disabled:opacity-50"
           >
             {loading ? 'Adding…' : 'Add brand'}
           </button>
         </form>
-        {error && <p className="text-sm text-red-600 mt-2">{error}</p>}
-        {success && <p className="text-sm text-teal-600 mt-2">{success}</p>}
-      </div>
+        {error && <p className="text-sm text-data-negative mt-2">{error}</p>}
+        {success && <p className="text-sm text-data-positive mt-2">{success}</p>}
+      </SectionCard>
 
       {/* Brand list */}
       {brands.length > 0 && (
-        <div className="bg-white border border-slate-200 rounded-2xl p-6">
-          <h2 className="text-base font-semibold text-slate-800 mb-4">Your brands</h2>
+        <SectionCard title="Your brands" padding="lg">
           <div className="space-y-2">
             {brands.map(b => (
-              <div key={b.id} className="flex items-center justify-between py-2.5 border-b border-slate-100 last:border-0">
+              <div key={b.id} className="flex items-center justify-between py-2.5 border-b border-border-subtle last:border-0">
                 <div>
-                  <p className="text-sm font-medium text-slate-800">{b.name}</p>
-                  <p className="text-xs text-slate-400">Amazon India</p>
+                  <p className="text-sm font-medium text-text-primary">{b.name}</p>
+                  <p className="text-xs text-text-muted">Amazon India</p>
                 </div>
                 <div className="flex gap-2">
                   <button
                     onClick={() => router.push(`/brands/${b.id}/upload`)}
-                    className="text-xs bg-teal-50 text-teal-700 font-medium px-3 py-1.5 rounded-lg hover:bg-teal-100 transition-colors"
+                    className="text-xs bg-accent-primary-subtle text-accent-primary font-medium px-3 py-1.5 rounded-lg hover:bg-accent-primary-subtle transition-colors"
                   >
                     Upload data
                   </button>
                   <button
                     onClick={() => router.push(`/brands/${b.id}/settings`)}
-                    className="text-xs bg-slate-50 text-slate-600 font-medium px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors"
+                    className="text-xs bg-surface-raised text-text-secondary font-medium px-3 py-1.5 rounded-lg hover:bg-surface-raised transition-colors"
                   >
                     Amazon settings
                   </button>
@@ -105,15 +103,15 @@ export default function SettingsPage() {
                     title={!b.is_connected ? 'Connect Amazon first' : undefined}
                     className={`text-xs font-medium px-3 py-1.5 rounded-lg transition-colors ${
                       b.is_connected
-                        ? 'bg-amber-50 text-amber-700 hover:bg-amber-100 cursor-pointer'
-                        : 'bg-slate-50 text-slate-300 cursor-not-allowed'
+                        ? 'bg-data-amber/10 text-data-amber hover:bg-data-amber/20 cursor-pointer'
+                        : 'bg-surface-raised text-text-muted cursor-not-allowed'
                     }`}
                   >
                     Alert config
                   </button>
                   <button
                     onClick={() => router.push(`/brands/${b.id}`)}
-                    className="text-xs bg-[#1E2761] text-white font-medium px-3 py-1.5 rounded-lg hover:bg-[#16205a] transition-colors"
+                    className="text-xs bg-surface-sidebar text-text-on-brand font-medium px-3 py-1.5 rounded-lg hover:opacity-90 transition-colors"
                   >
                     Dashboard
                   </button>
@@ -121,7 +119,7 @@ export default function SettingsPage() {
               </div>
             ))}
           </div>
-        </div>
+        </SectionCard>
       )}
     </div>
   )

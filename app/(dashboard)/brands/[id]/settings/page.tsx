@@ -5,6 +5,8 @@ import Link from 'next/link'
 import SyncControls from '@/components/settings/SyncControls'
 import ScheduleConfig from '@/components/settings/ScheduleConfig'
 import DisconnectButton from '@/components/settings/DisconnectButton'
+import { PageHeader } from '@/components/ui/PageHeader'
+import { SectionCard } from '@/components/ui/SectionCard'
 
 interface SyncSchedule {
   type: 'manual' | 'daily' | 'weekly' | 'custom' | 'on_login'
@@ -55,49 +57,45 @@ export default async function BrandSettingsPage({
 
   return (
     <div className="p-6 max-w-2xl">
-      {/* Header */}
-      <div className="mb-6">
-        <p className="text-sm text-slate-400">
-          <Link href="/dashboard" className="hover:text-slate-600">Command Center</Link>{' '}
-          ›{' '}
-          <Link href={`/brands/${id}`} className="hover:text-slate-600">{brand.name}</Link>{' '}
-          › Settings
-        </p>
-        <h1 className="text-2xl font-bold text-[#1E2761] mt-0.5">Settings — {brand.name}</h1>
-      </div>
+      <PageHeader
+        title={`Settings — ${brand.name}`}
+        breadcrumb={[
+          { label: 'Command Center', href: '/dashboard' },
+          { label: brand.name, href: `/brands/${id}` },
+        ]}
+      />
 
       {/* Sandbox banner */}
       {isSandbox && (
-        <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-700 font-medium">
+        <div className="mb-4 p-3 bg-data-amber/10 border border-border-default rounded-xl text-xs text-data-amber font-medium">
           🧪 Sandbox mode — SP-API calls use fixture data. Set <code>AMAZON_SANDBOX=false</code> for production.
         </div>
       )}
 
       {/* OAuth result banners */}
       {connected === 'true' && (
-        <div className="mb-4 p-3 bg-teal-50 border border-teal-200 rounded-xl text-sm text-teal-700">
+        <div className="mb-4 p-3 bg-data-positive/10 border border-border-default rounded-xl text-sm text-data-positive">
           ✅ Amazon account connected successfully.
         </div>
       )}
       {oauthError && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">
+        <div className="mb-4 p-3 bg-data-negative/10 border border-border-default rounded-xl text-sm text-data-negative">
           ❌ Connection failed: {oauthError.replace(/_/g, ' ')}. Please try again.
         </div>
       )}
 
       {/* Section 1: Amazon Connection */}
-      <section className="bg-white border border-slate-200 rounded-2xl p-6 mb-4">
-        <h2 className="text-base font-semibold text-[#1E2761] mb-4">Amazon Connection</h2>
+      <SectionCard title="Amazon Connection" padding="lg" className="mb-4">
         <div className="flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <span className={`inline-block w-2 h-2 rounded-full ${isConnected ? 'bg-teal-500' : 'bg-slate-300'}`} />
-              <p className="text-sm font-medium text-slate-700">
+              <span className={`inline-block w-2 h-2 rounded-full ${isConnected ? 'bg-data-positive' : 'bg-border-default'}`} />
+              <p className="text-sm font-medium text-text-primary">
                 {isConnected ? 'Connected' : 'Not connected'}
               </p>
             </div>
             {isConnected && creds.last_sync_at && (
-              <p className="text-xs text-slate-400 mt-0.5 ml-4">
+              <p className="text-xs text-text-muted mt-0.5 ml-4">
                 Last sync: {new Date(creds.last_sync_at).toLocaleString('en-IN')}
               </p>
             )}
@@ -107,39 +105,39 @@ export default async function BrandSettingsPage({
           ) : (
             <Link
               href={`/api/amazon/auth?brand_id=${id}`}
-              className="text-sm bg-[#0D9488] text-white font-semibold px-4 py-2 rounded-lg hover:bg-teal-700 transition-colors"
+              className="text-sm bg-accent-primary text-text-on-brand font-semibold px-4 py-2 rounded-lg hover:bg-accent-primary-hover transition-colors"
             >
               Connect Amazon
             </Link>
           )}
         </div>
-      </section>
+      </SectionCard>
 
       {/* Section 2: Sync Now */}
-      <section className="bg-white border border-slate-200 rounded-2xl p-6 mb-4">
-        <h2 className="text-base font-semibold text-[#1E2761] mb-4">Sync Now</h2>
+      <SectionCard title="Sync Now" padding="lg" className="mb-4">
         {!isConnected && (
-          <p className="text-sm text-slate-400 mb-3">Connect your Amazon account above to enable syncing.</p>
+          <p className="text-sm text-text-muted mb-3">Connect your Amazon account above to enable syncing.</p>
         )}
         <SyncControls
           brandId={id}
           isConnected={isConnected}
           lastLogs={recentLogs ?? []}
         />
-      </section>
+      </SectionCard>
 
       {/* Section 3: Auto-sync Schedule */}
-      <section className={`bg-white border border-slate-200 rounded-2xl p-6 ${!isConnected ? 'opacity-50 pointer-events-none' : ''}`}>
-        <div className="mb-4">
-          <h2 className="text-base font-semibold text-[#1E2761]">Auto-sync Schedule</h2>
-          <p className="text-xs text-slate-400 mt-0.5">
-            {isConnected
-              ? 'Scheduled syncs run automatically via Inngest.'
-              : 'Connect Amazon above to configure auto-sync.'}
-          </p>
-        </div>
+      <SectionCard
+        title="Auto-sync Schedule"
+        padding="lg"
+        className={!isConnected ? 'opacity-50 pointer-events-none' : ''}
+      >
+        <p className="text-xs text-text-muted mb-4">
+          {isConnected
+            ? 'Scheduled syncs run automatically via Inngest.'
+            : 'Connect Amazon above to configure auto-sync.'}
+        </p>
         <ScheduleConfig brandId={id} initialSchedule={schedule} />
-      </section>
+      </SectionCard>
     </div>
   )
 }

@@ -77,8 +77,8 @@ export default function ScheduleConfig({ brandId, initialSchedule }: Props) {
             onClick={() => setType(opt.value)}
             className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
               schedule.type === opt.value
-                ? 'bg-[#0D9488] text-white border-[#0D9488]'
-                : 'bg-white text-slate-500 border-slate-200 hover:border-teal-300'
+                ? 'bg-accent-primary text-text-on-brand border-accent-primary'
+                : 'bg-surface-card text-text-muted border-border-default hover:border-accent-primary'
             }`}
           >
             {opt.label}
@@ -89,7 +89,7 @@ export default function ScheduleConfig({ brandId, initialSchedule }: Props) {
       {/* Weekly — single day of week */}
       {schedule.type === 'weekly' && (
         <div>
-          <p className="text-xs text-slate-400 mb-2">Which day?</p>
+          <p className="text-xs text-text-muted mb-2">Which day?</p>
           <div className="flex gap-2 flex-wrap">
             {DAY_LABELS.map((label, i) => (
               <button
@@ -97,8 +97,8 @@ export default function ScheduleConfig({ brandId, initialSchedule }: Props) {
                 onClick={() => setWeekDay(i)}
                 className={`w-10 h-10 rounded-full text-xs font-semibold border transition-colors ${
                   weekDay === i
-                    ? 'bg-[#0D9488] text-white border-[#0D9488]'
-                    : 'bg-white text-slate-500 border-slate-200 hover:border-teal-300'
+                    ? 'bg-accent-primary text-text-on-brand border-accent-primary'
+                    : 'bg-surface-card text-text-muted border-border-default hover:border-accent-primary'
                 }`}
               >
                 {label}
@@ -111,7 +111,7 @@ export default function ScheduleConfig({ brandId, initialSchedule }: Props) {
       {/* Custom — multi-select days */}
       {schedule.type === 'custom' && (
         <div>
-          <p className="text-xs text-slate-400 mb-2">Which days?</p>
+          <p className="text-xs text-text-muted mb-2">Which days?</p>
           <div className="flex gap-2 flex-wrap">
             {DAY_LABELS.map((label, i) => (
               <button
@@ -119,8 +119,8 @@ export default function ScheduleConfig({ brandId, initialSchedule }: Props) {
                 onClick={() => toggleCustomDay(i)}
                 className={`w-10 h-10 rounded-full text-xs font-semibold border transition-colors ${
                   schedule.days.includes(i)
-                    ? 'bg-[#0D9488] text-white border-[#0D9488]'
-                    : 'bg-white text-slate-500 border-slate-200 hover:border-teal-300'
+                    ? 'bg-accent-primary text-text-on-brand border-accent-primary'
+                    : 'bg-surface-card text-text-muted border-border-default hover:border-accent-primary'
                 }`}
               >
                 {label}
@@ -132,7 +132,7 @@ export default function ScheduleConfig({ brandId, initialSchedule }: Props) {
 
       {/* On login hint */}
       {schedule.type === 'on_login' && (
-        <p className="text-xs text-slate-400">
+        <p className="text-xs text-text-muted">
           Data syncs automatically each time you open MerchMan.
         </p>
       )}
@@ -140,18 +140,18 @@ export default function ScheduleConfig({ brandId, initialSchedule }: Props) {
       {/* Time picker — daily / weekly / custom only */}
       {showTimePicker && (
         <div className="flex items-center gap-3">
-          <label className="text-sm text-slate-500 w-16">Time</label>
+          <label className="text-sm text-text-secondary w-16">Time</label>
           <input
             type="time"
             value={schedule.time}
             onChange={e => save({ ...schedule, time: e.target.value })}
-            className="border border-slate-200 rounded-lg px-3 py-1.5 text-sm text-slate-700 focus:outline-none focus:ring-1 focus:ring-teal-500"
+            className="border border-border-default bg-surface-card text-text-primary rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-accent-primary"
           />
         </div>
       )}
 
       {(saving || saved) && (
-        <p className="text-xs text-teal-600">{saving ? 'Saving…' : '✓ Saved'}</p>
+        <p className="text-xs text-data-positive">{saving ? 'Saving…' : '✓ Saved'}</p>
       )}
     </div>
   )

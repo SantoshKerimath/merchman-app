@@ -15,7 +15,7 @@ export default function DisconnectButton({ brandId }: Props) {
   return (
     <button
       onClick={handleDisconnect}
-      className="text-xs text-red-500 hover:text-red-700 font-medium"
+      className="text-xs text-data-negative hover:opacity-80 font-medium transition-opacity"
     >
       Disconnect
     </button>
