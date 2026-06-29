@@ -3,6 +3,7 @@ import {
   ComposedChart, Line, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer,
 } from 'recharts'
+import { useChartColors } from '@/lib/hooks/use-chart-colors'
 
 interface SessionMetric {
   date: string
@@ -19,10 +20,12 @@ function fmtDate(date: string): string {
 }
 
 export default function SessionsConversionChart({ data }: Props) {
+  const colors = useChartColors()
+
   if (data.length === 0) {
     return (
-      <div className="bg-white border border-slate-200 rounded-xl p-6 flex items-center justify-center min-h-[220px]">
-        <p className="text-sm text-slate-400">No sessions data yet. Connect Amazon to sync.</p>
+      <div className="bg-surface-card border border-border-default rounded-xl p-6 flex items-center justify-center min-h-[220px]">
+        <p className="text-sm text-text-muted">No sessions data yet. Connect Amazon to sync.</p>
       </div>
     )
   }
@@ -34,14 +37,14 @@ export default function SessionsConversionChart({ data }: Props) {
   }))
 
   return (
-    <div className="bg-white border border-slate-200 rounded-xl p-4">
-      <p className="text-xs font-medium text-slate-500 mb-3">Sessions &amp; Conversion Rate</p>
+    <div className="bg-surface-card border border-border-default rounded-xl p-4">
+      <p className="text-xs font-medium text-text-muted mb-3">Sessions &amp; Conversion Rate</p>
       <ResponsiveContainer width="100%" height={180}>
         <ComposedChart data={formatted} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-          <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontSize: 10 }} />
-          <YAxis yAxisId="left" tick={{ fontSize: 10 }} width={50} />
-          <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 10 }} unit="%" width={40} />
+          <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
+          <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontSize: 10, fill: colors.muted }} />
+          <YAxis yAxisId="left" tick={{ fontSize: 10, fill: colors.muted }} width={50} />
+          <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 10, fill: colors.muted }} unit="%" width={40} />
           <Tooltip
             formatter={(v: unknown, name: unknown) =>
               name === 'CVR %'
@@ -49,13 +52,14 @@ export default function SessionsConversionChart({ data }: Props) {
                 : [(v as number).toLocaleString(), name as string]
             }
             labelFormatter={(l: unknown) => fmtDate(l as string)}
+            contentStyle={{ background: 'var(--surface-card)', border: '1px solid var(--border-default)', borderRadius: 8, fontSize: 12, color: 'var(--text-primary)' }}
           />
           <Legend />
           <Line
             yAxisId="left"
             type="monotone"
             dataKey="sessions"
-            stroke="#1E2761"
+            stroke={colors.navy}
             strokeWidth={2}
             dot={false}
             name="Sessions"
@@ -64,7 +68,7 @@ export default function SessionsConversionChart({ data }: Props) {
             yAxisId="right"
             type="monotone"
             dataKey="cvr"
-            stroke="#0D9488"
+            stroke={colors.teal}
             strokeWidth={2}
             dot={false}
             name="CVR %"

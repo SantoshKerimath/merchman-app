@@ -3,6 +3,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ReferenceLine, ResponsiveContainer,
 } from 'recharts'
+import { useChartColors } from '@/lib/hooks/use-chart-colors'
 
 interface WeeklyPoint {
   week: string
@@ -14,14 +15,16 @@ interface Props {
   hasPPC: boolean
 }
 
-const EMPTY = (
-  <div className="bg-white border border-slate-200 rounded-xl p-6 flex items-center justify-center min-h-[220px]">
-    <p className="text-sm text-slate-400 text-center">No PPC data — upload XLSX with PPC Database tab</p>
-  </div>
-)
-
 export default function ACOSTrendChart({ data, hasPPC }: Props) {
-  if (!hasPPC) return EMPTY
+  const colors = useChartColors()
+
+  if (!hasPPC) {
+    return (
+      <div className="bg-surface-card border border-border-default rounded-xl p-6 flex items-center justify-center min-h-[220px]">
+        <p className="text-sm text-text-muted text-center">No PPC data — upload XLSX with PPC Database tab</p>
+      </div>
+    )
+  }
 
   const chartData = data
     .filter(d => d.acos !== null)
@@ -31,28 +34,31 @@ export default function ACOSTrendChart({ data, hasPPC }: Props) {
     }))
 
   return (
-    <div className="bg-white border border-slate-200 rounded-xl p-4">
-      <p className="text-xs font-medium text-slate-500 mb-3">ACOS Trend</p>
+    <div className="bg-surface-card border border-border-default rounded-xl p-4">
+      <p className="text-xs font-medium text-text-muted mb-3">ACOS Trend</p>
       <ResponsiveContainer width="100%" height={180}>
         <LineChart data={chartData} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-          <XAxis dataKey="week" tick={{ fontSize: 10 }} />
+          <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
+          <XAxis dataKey="week" tick={{ fontSize: 10, fill: colors.muted }} />
           <YAxis
             tickFormatter={v => `${v}%`}
-            tick={{ fontSize: 10 }}
+            tick={{ fontSize: 10, fill: colors.muted }}
             width={40}
           />
-          <Tooltip formatter={(v: unknown) => [`${v}%`, 'ACOS']} />
+          <Tooltip
+            formatter={(v: unknown) => [`${v}%`, 'ACOS']}
+            contentStyle={{ background: 'var(--surface-card)', border: '1px solid var(--border-default)', borderRadius: 8, fontSize: 12, color: 'var(--text-primary)' }}
+          />
           <ReferenceLine
             y={30}
-            stroke="#f59e0b"
+            stroke={colors.amber}
             strokeDasharray="4 4"
-            label={{ value: '30%', fontSize: 10, fill: '#f59e0b' }}
+            label={{ value: '30%', fontSize: 10, fill: colors.amber }}
           />
           <Line
             type="monotone"
             dataKey="acos"
-            stroke="#0D9488"
+            stroke={colors.teal}
             strokeWidth={2}
             dot={false}
             connectNulls
