@@ -27,7 +27,7 @@ function KpiStrip({ rows }: Props) {
   const totalSales       = rows.reduce((s, r) => s + (r.sales ?? 0), 0)
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-      <KpiBox label="Impressions"  value={totalImpressions.toLocaleString('en-IN')} />
+      <KpiBox label="Total Impressions"  value={totalImpressions.toLocaleString('en-IN')} />
       <KpiBox label="Avg CTR"      value={`${avgCtr.toFixed(2)}%`} />
       <KpiBox label="Total Orders" value={totalOrders.toLocaleString('en-IN')} />
       <KpiBox label="Ad Sales"     value={formatINR(totalSales)} />
@@ -56,8 +56,8 @@ function SpendDonut({
             data={data} cx="50%" cy="50%" innerRadius={55} outerRadius={80}
             dataKey="value" nameKey="name"
           >
-            {data.map((_, i) => (
-              <Cell key={i} fill={colorList[i % colorList.length]} />
+            {data.map((entry, i) => (
+              <Cell key={entry.name} fill={colorList[i % colorList.length]} />
             ))}
           </Pie>
           <Tooltip
@@ -67,7 +67,7 @@ function SpendDonut({
           <Legend
             formatter={(v) => {
               const entry = data.find(d => d.name === v)
-              const pct = entry && total > 0 ? ((entry.value / total) * 100).toFixed(0) : 0
+              const pct = entry && total > 0 ? ((entry.value / total) * 100).toFixed(0) : '0'
               return <span style={{ fontSize: 11 }}>{v} ({pct}%)</span>
             }}
           />
