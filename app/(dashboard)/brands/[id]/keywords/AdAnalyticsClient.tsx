@@ -31,30 +31,25 @@ export default function AdAnalyticsClient({ brandId }: Props) {
   const [fromInput, setFromInput] = useState(last30().from)
   const [toInput, setToInput]     = useState(last30().to)
 
-  const load = useCallback(async (view: Tab, from: string, to: string) => {
-    setLoading(true)
-    try {
-      const r = await fetch(
-        `/api/brands/${brandId}/targeting?view=${view}&from=${from}&to=${to}`
-      )
-      if (!r.ok) return
-      const data = await r.json()
-      if (view === 'campaigns') setCampaigns(data as CampaignRow[])
-      else                       setTargeting(data as TargetingViewRow[])
-    } finally {
-      setLoading(false)
-    }
+  const fetchView = useCallback(async (view: Tab, from: string, to: string) => {
+    const r = await fetch(
+      `/api/brands/${brandId}/targeting?view=${view}&from=${from}&to=${to}`
+    )
+    if (!r.ok) return
+    const data = await r.json()
+    if (view === 'campaigns') setCampaigns(data as CampaignRow[])
+    else                       setTargeting(data as TargetingViewRow[])
   }, [brandId])
 
   // Fetch both views on mount and when dateRange changes
   useEffect(() => {
     const { from, to } = dateRange
+    setLoading(true)
     Promise.all([
-      load('campaigns', from, to),
-      fetch(`/api/brands/${brandId}/targeting?view=targeting&from=${from}&to=${to}`)
-        .then(r => r.json()).then(d => setTargeting(d as TargetingViewRow[])),
+      fetchView('campaigns', from, to),
+      fetchView('targeting', from, to),
     ]).finally(() => setLoading(false))
-  }, [brandId, dateRange, load])
+  }, [brandId, dateRange, fetchView])
 
   function applyDates() {
     if (!fromInput || !toInput) return
@@ -71,13 +66,12 @@ export default function AdAnalyticsClient({ brandId }: Props) {
       const json = await r.json()
       if (r.ok) {
         setUploadMsg(`✓ ${json.inserted} rows imported`)
-        // Reload both views
         const { from, to } = dateRange
+        setLoading(true)
         await Promise.all([
-          load('campaigns', from, to),
-          fetch(`/api/brands/${brandId}/targeting?view=targeting&from=${from}&to=${to}`)
-            .then(r2 => r2.json()).then(d => setTargeting(d as TargetingViewRow[])),
-        ])
+          fetchView('campaigns', from, to),
+          fetchView('targeting', from, to),
+        ]).finally(() => setLoading(false))
       } else {
         setUploadMsg(`✗ ${json.error}`)
       }

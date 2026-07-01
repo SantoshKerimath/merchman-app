@@ -82,9 +82,11 @@ export function aggregateByCampaign(rows: RawRow[]): CampaignRow[] {
 }
 
 /** Normalise ACOS/CTR/CVR from Amazon's report to 0–1 ratio.
- *  Amazon may return "35.00%" which the parser strips to 35.
- *  We want 0.35. */
+ *  Amazon SP Targeting reports store rates as percentages (e.g. 5.5 for 5.5%)
+ *  after the parser strips the "%" character. Always divide by 100 to get a 0–1 ratio. */
 export function normalizeRate(v: number | null): number | null {
   if (v === null) return null
-  return v > 1 ? v / 100 : v
+  // Amazon SP Targeting reports store rates as percentages (e.g. 5.5 for 5.5%)
+  // after the parser strips the "%" character. Always divide by 100 to get a 0–1 ratio.
+  return v / 100
 }

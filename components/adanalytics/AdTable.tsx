@@ -175,16 +175,18 @@ export default function AdTable({
   tab: 'campaigns' | 'targeting'
 }) {
   // For targeting view, combine CAMPAIGN_COLS + TARGETING_EXTRA_COLS
-  const baseCols: ColDef[] = tab === 'campaigns'
-    ? CAMPAIGN_COLS
-    : [
-        CAMPAIGN_COLS[0], // campaign_name
-        TARGETING_EXTRA_COLS[0], // targeting
-        TARGETING_EXTRA_COLS[1], // match_type
-        TARGETING_EXTRA_COLS[2], // placement
-        TARGETING_EXTRA_COLS[3], // ad_group
-        ...CAMPAIGN_COLS.slice(1), // rest of metrics
-      ]
+  const baseCols = useMemo<ColDef[]>(() => {
+    return tab === 'campaigns'
+      ? CAMPAIGN_COLS
+      : [
+          CAMPAIGN_COLS[0], // campaign_name
+          TARGETING_EXTRA_COLS[0], // targeting
+          TARGETING_EXTRA_COLS[1], // match_type
+          TARGETING_EXTRA_COLS[2], // placement
+          TARGETING_EXTRA_COLS[3], // ad_group
+          ...CAMPAIGN_COLS.slice(1), // rest of metrics
+        ]
+  }, [tab])
 
   const [visible, setVisible] = useState<Set<string>>(() => loadVisibility(baseCols, tab))
   const [showColMenu, setShowColMenu]   = useState(false)
@@ -195,7 +197,7 @@ export default function AdTable({
 
   useEffect(() => {
     setVisible(loadVisibility(baseCols, tab))
-  }, [tab])
+  }, [tab, baseCols])
 
   useEffect(() => { setPage(1) }, [rows, tab, search])
 
