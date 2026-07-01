@@ -45,7 +45,7 @@ function matchColor(type: string | null): BadgeColor {
 
 function placementColor(p: PlacementType): BadgeColor {
   const map: Record<PlacementType, BadgeColor> = { Keyword: 'teal', Product: 'blue', Category: 'amber', Auto: 'slate' }
-  return map[p]
+  return map[p] ?? 'slate'
 }
 
 const CAMPAIGN_COLS: ColDef[] = [
@@ -151,18 +151,16 @@ function downloadXLSX(rows: Record<string, unknown>[], cols: ColDef[], name: str
 
 // ── Column visibility ─────────────────────────────────────────────────────────
 
-const LS_KEY = 'mm_adtable_cols'
-
-function loadVisibility(cols: ColDef[]): Set<string> {
+function loadVisibility(cols: ColDef[], tab: string): Set<string> {
   try {
-    const raw = localStorage.getItem(LS_KEY)
+    const raw = localStorage.getItem(`mm_adtable_cols_${tab}`)
     if (raw) return new Set(JSON.parse(raw) as string[])
   } catch { /* ignore */ }
   return new Set(cols.filter(c => c.defaultVisible).map(c => c.key))
 }
 
-function saveVisibility(visible: Set<string>) {
-  localStorage.setItem(LS_KEY, JSON.stringify([...visible]))
+function saveVisibility(visible: Set<string>, tab: string) {
+  localStorage.setItem(`mm_adtable_cols_${tab}`, JSON.stringify([...visible]))
 }
 
 // ── Main component ────────────────────────────────────────────────────────────
@@ -188,12 +186,16 @@ export default function AdTable({
         ...CAMPAIGN_COLS.slice(1), // rest of metrics
       ]
 
-  const [visible, setVisible] = useState<Set<string>>(() => loadVisibility(baseCols))
+  const [visible, setVisible] = useState<Set<string>>(() => loadVisibility(baseCols, tab))
   const [showColMenu, setShowColMenu]   = useState(false)
   const [sortKey, setSortKey]           = useState<string>('spend')
   const [sortDir, setSortDir]           = useState<SortDir>('desc')
   const [search, setSearch]             = useState('')
   const [page, setPage]                 = useState(1)
+
+  useEffect(() => {
+    setVisible(loadVisibility(baseCols, tab))
+  }, [tab])
 
   useEffect(() => { setPage(1) }, [rows, tab, search])
 
@@ -223,7 +225,7 @@ export default function AdTable({
     const next = new Set(visible)
     next.has(key) ? next.delete(key) : next.add(key)
     setVisible(next)
-    saveVisibility(next)
+    saveVisibility(next, tab)
   }
 
   const exportName = `ad-analytics-${tab}-${new Date().toISOString().split('T')[0]}`
