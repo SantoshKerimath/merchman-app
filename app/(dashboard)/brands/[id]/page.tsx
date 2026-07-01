@@ -205,7 +205,7 @@ export default async function BrandPage({
               href={`/brands/${id}/keywords`}
               className="text-sm border border-border-default text-text-secondary font-medium px-4 py-2 rounded-lg hover:bg-surface-raised transition-colors"
             >
-              Keywords
+              Ad Analytics
             </Link>
             <Link
               href={`/brands/${id}/upload`}
