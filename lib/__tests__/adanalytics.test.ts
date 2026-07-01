@@ -52,6 +52,12 @@ describe('aggregateByCampaign', () => {
     expect(result[0].roas).toBeNull()
   })
 
+  it('returns null roas when spend is 0', () => {
+    const rows = [makeRow('D', { spend: 0, sales: 500, orders: 5 })]
+    const result = aggregateByCampaign(rows)
+    expect(result[0].roas).toBeNull()
+  })
+
   it('sorts by spend descending', () => {
     const rows = [makeRow('A', { spend: 100 }), makeRow('B', { spend: 300 })]
     const result = aggregateByCampaign(rows)
