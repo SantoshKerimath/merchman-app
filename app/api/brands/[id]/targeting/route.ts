@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { parseSpTargetingBuffer } from '@/lib/parsers/sp-targeting'
+import { aggregateByCampaign, classifyPlacement, normalizeRate } from '@/lib/adanalytics'
+import type { RawRow } from '@/lib/adanalytics'
 
 export async function POST(
   request: NextRequest,
@@ -49,7 +51,7 @@ export async function POST(
 }
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id: brandId } = await params
@@ -57,38 +59,43 @@ export async function GET(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  const { searchParams } = new URL(request.url)
+  const view = searchParams.get('view') ?? 'campaigns'
+  const from = searchParams.get('from')
+  const to   = searchParams.get('to')
+
   const serviceClient = createServiceClient()
 
-  // Top 20 keywords by spend
-  const { data: topSpend } = await serviceClient
+  let query = serviceClient
     .from('ppc_targeting')
-    .select('targeting, match_type, impressions, clicks, spend, sales, acos, roas, orders, cvr')
+    .select('campaign_name, ad_group, targeting, match_type, impressions, clicks, spend, sales, acos, roas, orders, units, ctr, cpc, cvr')
     .eq('brand_id', brandId)
-    .not('targeting', 'is', null)
-    .order('spend', { ascending: false })
-    .limit(20)
-
-  // High spend, zero conversion (negative targeting candidates)
-  const { data: wasted } = await serviceClient
-    .from('ppc_targeting')
-    .select('targeting, match_type, spend, clicks, orders')
-    .eq('brand_id', brandId)
-    .not('targeting', 'is', null)
     .gt('spend', 0)
-    .eq('orders', 0)
-    .order('spend', { ascending: false })
-    .limit(20)
 
-  // Top converters (lowest ACOS, min 1 order)
-  const { data: topConverters } = await serviceClient
-    .from('ppc_targeting')
-    .select('targeting, match_type, spend, sales, acos, roas, orders, cvr')
-    .eq('brand_id', brandId)
-    .not('targeting', 'is', null)
-    .gt('orders', 0)
-    .not('acos', 'is', null)
-    .order('acos', { ascending: true })
-    .limit(20)
+  if (from) query = query.gte('start_date', from)
+  if (to)   query = query.lte('start_date', to)
 
-  return NextResponse.json({ topSpend, wasted, topConverters })
+  const { data, error } = await query.order('spend', { ascending: false })
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (!data || data.length === 0) return NextResponse.json([])
+
+  // Cast to RawRow (Supabase returns loose types)
+  const rows = data as RawRow[]
+
+  if (view === 'campaigns') {
+    return NextResponse.json(aggregateByCampaign(rows))
+  }
+
+  // targeting view: return raw rows with normalized rates + placement
+  const targeting = rows.map((r) => ({
+    ...r,
+    acos:      normalizeRate(r.acos),
+    roas:      r.roas ?? (r.spend && r.sales ? r.sales / r.spend : null),
+    ctr:       normalizeRate(r.ctr),
+    cvr:       normalizeRate(r.cvr),
+    placement: classifyPlacement(r.targeting, r.match_type),
+  }))
+
+  return NextResponse.json(targeting)
 }
