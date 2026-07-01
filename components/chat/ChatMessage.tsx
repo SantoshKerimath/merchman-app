@@ -39,22 +39,22 @@ function EmailCard({ email }: { email: EmailDraft }) {
   }
 
   return (
-    <div className="bg-white border border-slate-200 rounded-xl overflow-hidden text-sm">
+    <div className="bg-surface-card border border-border-default rounded-xl overflow-hidden text-sm">
       {/* Header */}
-      <div className="bg-slate-50 border-b border-slate-200 px-3 py-2 flex items-center justify-between gap-2">
+      <div className="bg-surface-raised border-b border-border-default px-3 py-2 flex items-center justify-between gap-2">
         <div className="min-w-0">
-          <p className="text-xs text-slate-500 truncate">To: {email.to}</p>
-          <p className="font-semibold text-slate-800 truncate">{email.subject}</p>
+          <p className="text-xs text-text-muted truncate">To: {email.to}</p>
+          <p className="font-semibold text-text-primary truncate">{email.subject}</p>
         </div>
         <button
           onClick={copy}
-          className="flex-shrink-0 text-xs px-2.5 py-1 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-100 transition-colors"
+          className="flex-shrink-0 text-xs px-2.5 py-1 rounded-lg border border-border-default text-text-secondary hover:bg-surface-raised transition-colors"
         >
           {copied ? '✓ Copied' : 'Copy'}
         </button>
       </div>
       {/* Body */}
-      <div className="px-3 py-2.5 prose prose-sm max-w-none text-slate-700 whitespace-pre-wrap leading-relaxed max-h-64 overflow-y-auto">
+      <div className="px-3 py-2.5 prose prose-sm max-w-none text-text-secondary whitespace-pre-wrap leading-relaxed max-h-64 overflow-y-auto">
         {email.body}
       </div>
     </div>
@@ -68,16 +68,16 @@ export default function ChatMessage({ message }: { message: Message }) {
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}>
       <div className={`max-w-[85%] ${isUser ? 'order-2' : 'order-1'}`}>
         {isUser ? (
-          <div className="bg-teal-500 text-white rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm whitespace-pre-wrap">
+          <div className="bg-accent-primary text-white rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm whitespace-pre-wrap">
             {message.content}
           </div>
         ) : (
           <div className="space-y-2">
             {message.content && (
-              <div className="bg-white border border-slate-200 rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm text-slate-800 prose prose-sm max-w-none">
+              <div className="bg-surface-card border border-border-default rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm text-text-primary prose prose-sm max-w-none">
                 <ReactMarkdown>{message.content}</ReactMarkdown>
                 {message.streaming && (
-                  <span className="inline-block w-1 h-4 bg-teal-500 ml-0.5 animate-pulse" />
+                  <span className="inline-block w-1 h-4 bg-accent-primary ml-0.5 animate-pulse" />
                 )}
               </div>
             )}
@@ -92,11 +92,11 @@ export default function ChatMessage({ message }: { message: Message }) {
                 key={i}
                 href={file.url}
                 download={file.filename}
-                className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm text-teal-600 hover:bg-teal-50 transition-colors"
+                className="flex items-center gap-2 bg-surface-card border border-border-default rounded-xl px-3 py-2 text-sm text-accent-primary hover:bg-accent-primary/10 transition-colors"
               >
                 <span>{file.ext === 'xlsx' ? '📊' : '📑'}</span>
                 <span className="font-medium">{file.filename}</span>
-                <span className="text-xs text-slate-400 ml-auto">Download</span>
+                <span className="text-xs text-text-muted ml-auto">Download</span>
               </a>
             ))}
           </div>

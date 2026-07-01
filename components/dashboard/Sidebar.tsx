@@ -1,10 +1,11 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
-import { Zap, Tag, Bell } from 'lucide-react'
+import { Zap, Tag, Bell, LogOut } from 'lucide-react'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { createClient } from '@/lib/supabase/client'
 
 const navItems = [
   { href: '/dashboard', label: 'Command Center', Icon: Zap },
@@ -14,7 +15,25 @@ const navItems = [
 
 export default function Sidebar() {
   const pathname = usePathname()
+  const router = useRouter()
   const [unresolvedCount, setUnresolvedCount] = useState(0)
+  const [userEmail, setUserEmail] = useState<string | null>(null)
+  const [userInitial, setUserInitial] = useState('?')
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data }) => {
+      const email = data.user?.email ?? null
+      setUserEmail(email)
+      if (email) setUserInitial(email[0].toUpperCase())
+    })
+  }, [])
+
+  async function handleLogout() {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    router.push('/login')
+  }
 
   useEffect(() => {
     async function fetchCount() {
@@ -67,10 +86,30 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* Footer */}
-      <div className="px-4 py-4 border-t border-white/10 flex items-center justify-between">
-        <p className="text-xs text-white/30">MerchMan v0.1</p>
-        <ThemeToggle />
+      {/* User + Footer */}
+      <div className="border-t border-white/10">
+        {/* Profile row */}
+        <div className="px-4 py-3 flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-accent-primary flex items-center justify-center flex-shrink-0">
+            <span className="text-xs font-bold text-white">{userInitial}</span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-medium text-white truncate">{userEmail ?? '—'}</p>
+            <p className="text-[10px] text-white/40">Merchant</p>
+          </div>
+          <button
+            onClick={handleLogout}
+            title="Log out"
+            className="p-1.5 rounded-md text-white/40 hover:text-white hover:bg-white/10 transition-colors"
+          >
+            <LogOut size={14} />
+          </button>
+        </div>
+        {/* Version + theme */}
+        <div className="px-4 pb-4 flex items-center justify-between">
+          <p className="text-xs text-white/30">MerchMan v0.1</p>
+          <ThemeToggle />
+        </div>
       </div>
     </aside>
   )

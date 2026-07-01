@@ -12,3 +12,13 @@ Task 7: complete (commits 85e8612..1b2d75e, review clean — SortBar hover fixed
 Task 8: complete (commits 1b2d75e..e1ed774, review clean after fix — text-red-500→data-negative, hover affordance restored)
 Task 9: complete (commits e1ed774..0856662, review approved — bg-data-negative valid via --color-data-negative utility)
 Task 10: complete (commits 0856662..9054e5d, review approved — all 8 files clean)
+
+# Ad Analytics SDD Progress
+# Plan: docs/superpowers/plans/2026-07-01-ad-analytics.md
+# Branch base: 5aa3f13
+
+Task 1: complete (commits 5aa3f13..f3fb875, review approved — ROAS null guard improved, missing test added)
+Task 2: complete (commits f3fb875..fea4c8f, review approved — clean, minor: unbounded query on large datasets)
+Task 3: complete (commits fea4c8f..154a3ba, review approved after fixes — Cell import, sort top8, tooltip contentStyle)
+Task 4: complete (commits 32b61b2..e1294f0, review approved after fixes — label, Cell key, pct type)
+Task 5: complete (commits e1294f0..3555336, review approved — per-tab localStorage, placementColor fallback)

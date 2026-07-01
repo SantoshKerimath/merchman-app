@@ -289,7 +289,7 @@ export default function ChatSidebar() {
   )
 
   return (
-    <div className="w-[40%] flex-shrink-0 h-full flex flex-col border-l border-slate-200 bg-white shadow-[-4px_0_24px_rgba(0,0,0,0.06)]">
+    <div className="w-[40%] flex-shrink-0 h-full flex flex-col border-l border-border-default bg-surface-card shadow-[-4px_0_24px_rgba(0,0,0,0.06)]">
       {/* ── Left panel: sessions ── */}
       <div className="flex h-full">
         <SessionList />
@@ -298,30 +298,30 @@ export default function ChatSidebar() {
         <div className="flex-1 flex flex-col min-w-0">
 
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-2.5 border-b border-slate-200 bg-white">
+          <div className="flex items-center justify-between px-4 py-2.5 border-b border-border-default bg-surface-card">
             <div className="flex items-center gap-2">
               <span className="text-base">🤖</span>
-              <span className="text-sm font-semibold text-slate-800">MerchMan AI</span>
+              <span className="text-sm font-semibold text-text-primary">MerchMan AI</span>
             </div>
             <button
               onClick={() => setOpen(false)}
-              className="w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors text-sm"
+              className="w-7 h-7 flex items-center justify-center rounded-lg text-text-muted hover:text-text-secondary hover:bg-surface-raised transition-colors text-sm"
             >
               ✕
             </button>
           </div>
 
           {/* Context tags bar */}
-          <div className="flex flex-wrap items-center gap-1.5 px-3 py-2 border-b border-slate-100 bg-slate-50 min-h-[40px]">
+          <div className="flex flex-wrap items-center gap-1.5 px-3 py-2 border-b border-border-subtle bg-surface-raised min-h-[40px]">
             {contextTags.map((tag) => (
               <span
                 key={tag.id}
                 className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${
                   tag.type === 'brand'
-                    ? 'bg-[#1E2761]/10 text-[#1E2761]'
+                    ? 'bg-surface-sidebar/10 text-surface-sidebar'
                     : tag.type === 'date'
-                    ? 'bg-teal-50 text-teal-700'
-                    : 'bg-slate-200 text-slate-600'
+                    ? 'bg-accent-primary/10 text-accent-primary'
+                    : 'bg-surface-raised text-text-secondary'
                 }`}
               >
                 {tag.label}
@@ -347,12 +347,12 @@ export default function ChatSidebar() {
                 }}
                 onBlur={addCustomTag}
                 placeholder="Add context…"
-                className="text-xs border border-slate-300 rounded-full px-2 py-0.5 outline-none focus:border-teal-400 w-28 bg-white"
+                className="text-xs border border-border-default rounded-full px-2 py-0.5 outline-none focus:border-accent-primary w-28 bg-surface-card"
               />
             ) : (
               <button
                 onClick={() => setAddingTag(true)}
-                className="text-xs text-slate-400 hover:text-teal-600 transition-colors px-1"
+                className="text-xs text-text-muted hover:text-accent-primary transition-colors px-1"
               >
                 + Add context
               </button>
@@ -362,9 +362,9 @@ export default function ChatSidebar() {
           {/* Messages */}
           <div className="flex-1 overflow-y-auto px-4 py-4">
             {messages.length === 0 && (
-              <div className="text-center mt-12 text-slate-400">
+              <div className="text-center mt-12 text-text-muted">
                 <p className="text-2xl mb-2">💬</p>
-                <p className="text-sm font-medium text-slate-600">Ask anything about your data</p>
+                <p className="text-sm font-medium text-text-secondary">Ask anything about your data</p>
                 <p className="text-xs mt-1">
                   {contextTags.length > 0
                     ? `Context: ${contextTags.map((t) => t.label).join(', ')}`

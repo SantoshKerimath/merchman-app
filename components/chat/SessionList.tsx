@@ -57,7 +57,7 @@ export default function SessionList() {
 
   const pct = Math.min((monthlyCostUsd / band.usd) * 100, 100)
   const overLimit = monthlyCostUsd >= band.usd
-  const barColor = pct >= 90 ? 'bg-red-500' : pct >= 70 ? 'bg-amber-400' : 'bg-teal-500'
+  const barColor = pct >= 90 ? 'bg-red-500' : pct >= 70 ? 'bg-amber-400' : 'bg-accent-primary'
 
   const selectBand = (b: Band) => {
     setBand(b)
@@ -66,11 +66,11 @@ export default function SessionList() {
   }
 
   return (
-    <div className="w-52 flex-shrink-0 border-r border-slate-200 flex flex-col bg-slate-50 h-full">
-      <div className="p-3 border-b border-slate-200">
+    <div className="w-52 flex-shrink-0 border-r border-border-default flex flex-col bg-surface-raised h-full">
+      <div className="p-3 border-b border-border-default">
         <button
           onClick={() => setActiveSessionId(null)}
-          className="w-full text-sm bg-teal-500 hover:bg-teal-600 text-white rounded-lg px-3 py-2 font-medium transition-colors"
+          className="w-full text-sm bg-accent-primary hover:bg-accent-primary-hover text-white rounded-lg px-3 py-2 font-medium transition-colors"
         >
           + New chat
         </button>
@@ -83,26 +83,26 @@ export default function SessionList() {
             onClick={() => setActiveSessionId(s.id)}
             className={`w-full text-left px-3 py-2 text-xs rounded-lg mx-1 mb-0.5 transition-colors truncate ${
               activeSessionId === s.id
-                ? 'bg-teal-50 text-teal-700 font-medium'
-                : 'text-slate-600 hover:bg-slate-100'
+                ? 'bg-accent-primary/10 text-accent-primary font-medium'
+                : 'text-text-secondary hover:bg-surface-raised'
             }`}
           >
             {s.title}
           </button>
         ))}
         {sessions.length === 0 && (
-          <p className="text-xs text-slate-400 px-3 py-4">No chats yet</p>
+          <p className="text-xs text-text-muted px-3 py-4">No chats yet</p>
         )}
       </div>
 
       {/* Usage meter */}
-      <div className="p-3 border-t border-slate-200 space-y-2">
+      <div className="p-3 border-t border-border-default space-y-2">
         <div className="flex items-center justify-between">
-          <p className="text-xs text-slate-400 font-medium">This month</p>
+          <p className="text-xs text-text-muted font-medium">This month</p>
           {/* Band picker toggle */}
           <button
             onClick={() => setShowBandPicker((v) => !v)}
-            className="text-xs text-slate-400 hover:text-teal-600 transition-colors"
+            className="text-xs text-text-muted hover:text-accent-primary transition-colors"
             title="Change plan limit"
           >
             {band.label} ▾
@@ -111,15 +111,15 @@ export default function SessionList() {
 
         {/* Band picker dropdown */}
         {showBandPicker && (
-          <div className="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden">
+          <div className="bg-surface-card border border-border-default rounded-lg shadow-sm overflow-hidden">
             {BANDS.map((b) => (
               <button
                 key={b.usd}
                 onClick={() => selectBand(b)}
                 className={`w-full text-left px-3 py-1.5 text-xs transition-colors ${
                   b.usd === band.usd
-                    ? 'bg-teal-50 text-teal-700 font-medium'
-                    : 'text-slate-600 hover:bg-slate-50'
+                    ? 'bg-accent-primary/10 text-accent-primary font-medium'
+                    : 'text-text-secondary hover:bg-surface-raised'
                 }`}
               >
                 {b.label} — ${b.usd}/mo
@@ -131,12 +131,12 @@ export default function SessionList() {
         {/* Progress bar */}
         <div className="space-y-1">
           <div className="flex justify-between text-xs">
-            <span className={overLimit ? 'text-red-600 font-medium' : 'text-slate-700'}>
+            <span className={overLimit ? 'text-red-600 font-medium' : 'text-text-secondary'}>
               {formatCost(monthlyCostUsd)}
             </span>
-            <span className="text-slate-400">${band.usd}</span>
+            <span className="text-text-muted">${band.usd}</span>
           </div>
-          <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+          <div className="h-1.5 bg-border-default rounded-full overflow-hidden">
             <div
               className={`h-full rounded-full transition-all ${barColor}`}
               style={{ width: `${pct}%` }}

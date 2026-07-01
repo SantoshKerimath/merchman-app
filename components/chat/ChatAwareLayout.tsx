@@ -11,7 +11,7 @@ export default function ChatAwareLayout({ children }: { children: ReactNode }) {
     <div className="flex flex-1 min-w-0 overflow-hidden">
       {/* Main content — shrinks to 60% when chat open */}
       <main
-        className={`overflow-y-auto bg-[#F8FAFC] transition-all duration-300 ${
+        className={`overflow-y-auto bg-surface-page transition-all duration-300 ${
           open ? 'w-[60%]' : 'flex-1'
         }`}
       >

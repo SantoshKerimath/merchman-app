@@ -65,14 +65,14 @@ export default function ChatInput({ onSend, disabled }: Props) {
     setAttachments((prev) => prev.filter((a) => a.id !== id))
 
   return (
-    <div className="border-t border-slate-200 p-3 bg-white">
+    <div className="border-t border-border-default p-3 bg-surface-card">
       {/* Attachment chips */}
       {attachments.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mb-2">
           {attachments.map((a) => (
             <span
               key={a.id}
-              className="inline-flex items-center gap-1 text-xs bg-slate-100 text-slate-700 rounded-lg px-2 py-1 max-w-[180px]"
+              className="inline-flex items-center gap-1 text-xs bg-surface-raised text-text-secondary rounded-lg px-2 py-1 max-w-[180px]"
             >
               <span className="flex-shrink-0">{fileIcon(a.file.name)}</span>
               <span className="truncate">{a.file.name}</span>
@@ -88,14 +88,14 @@ export default function ChatInput({ onSend, disabled }: Props) {
         </div>
       )}
 
-      <div className="flex items-end gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
+      <div className="flex items-end gap-2 bg-surface-raised border border-border-default rounded-xl px-3 py-2">
         {/* Paperclip */}
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
           disabled={disabled}
           title="Attach file (PDF, PPTX, DOCX, XLSX, CSV, image)"
-          className="flex-shrink-0 w-7 h-7 flex items-center justify-center text-slate-400 hover:text-teal-600 disabled:opacity-40 transition-colors"
+          className="flex-shrink-0 w-7 h-7 flex items-center justify-center text-text-muted hover:text-accent-primary disabled:opacity-40 transition-colors"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -131,14 +131,14 @@ export default function ChatInput({ onSend, disabled }: Props) {
           placeholder="Ask about your data..."
           rows={1}
           disabled={disabled}
-          className="flex-1 resize-none bg-transparent text-sm text-slate-800 placeholder-slate-400 outline-none max-h-40 overflow-y-auto"
+          className="flex-1 resize-none bg-transparent text-sm text-text-primary placeholder-text-muted outline-none max-h-40 overflow-y-auto"
         />
 
         {/* Send */}
         <button
           onClick={send}
           disabled={(!value.trim() && attachments.length === 0) || disabled}
-          className="flex-shrink-0 w-8 h-8 rounded-lg bg-teal-500 disabled:bg-slate-200 hover:bg-teal-600 disabled:cursor-not-allowed text-white flex items-center justify-center transition-colors"
+          className="flex-shrink-0 w-8 h-8 rounded-lg bg-accent-primary disabled:bg-surface-raised hover:bg-accent-primary-hover disabled:cursor-not-allowed text-white flex items-center justify-center transition-colors"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -153,7 +153,7 @@ export default function ChatInput({ onSend, disabled }: Props) {
         </button>
       </div>
 
-      <p className="text-xs text-slate-400 mt-1 px-1">
+      <p className="text-xs text-text-muted mt-1 px-1">
         Enter to send · Shift+Enter for newline · 📎 to attach files
       </p>
     </div>

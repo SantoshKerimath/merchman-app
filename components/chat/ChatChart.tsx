@@ -17,6 +17,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts'
+import { useChartColors } from '@/lib/hooks/use-chart-colors'
 
 export interface ChartConfig {
   type: 'bar' | 'line' | 'area' | 'pie'
@@ -27,8 +28,6 @@ export interface ChartConfig {
   currency?: boolean
 }
 
-const COLORS = ['#0d9488', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899']
-
 const formatVal = (v: unknown, currency?: boolean) => {
   if (typeof v !== 'number') return String(v)
   if (currency) return `₹${v.toLocaleString('en-IN')}`
@@ -37,11 +36,13 @@ const formatVal = (v: unknown, currency?: boolean) => {
 
 export default function ChatChart({ config }: { config: ChartConfig }) {
   const { type, title, data, xKey, yKeys, currency } = config
+  const chartColors = useChartColors()
+  const COLORS = [chartColors.teal, '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899']
   const tickFormatter = (v: unknown) => formatVal(v, currency)
 
   return (
-    <div className="my-3 bg-white border border-slate-200 rounded-xl p-4">
-      <p className="text-sm font-semibold text-slate-700 mb-3">{title}</p>
+    <div className="my-3 bg-surface-card border border-border-default rounded-xl p-4">
+      <p className="text-sm font-semibold text-text-secondary mb-3">{title}</p>
       <ResponsiveContainer width="100%" height={240}>
         {type === 'pie' ? (
           <PieChart>

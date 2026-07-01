@@ -10,7 +10,7 @@ export default function ChatLauncher() {
   return (
     <button
       onClick={() => setOpen(true)}
-      className="fixed bottom-6 right-6 z-[60] w-14 h-14 rounded-full bg-teal-500 hover:bg-teal-600 text-white shadow-lg flex items-center justify-center transition-all hover:scale-105"
+      className="fixed bottom-6 right-6 z-[60] w-14 h-14 rounded-full bg-accent-primary hover:bg-accent-primary-hover text-white shadow-lg flex items-center justify-center transition-all hover:scale-105"
       aria-label="Open AI assistant"
     >
       <svg
