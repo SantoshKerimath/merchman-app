@@ -3,7 +3,7 @@
 
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, ScatterChart, Scatter, ZAxis, Legend,
+  ResponsiveContainer, ScatterChart, Scatter, ZAxis, Legend, Cell,
 } from 'recharts'
 import { useChartColors } from '@/lib/hooks/use-chart-colors'
 import { formatINR } from '@/lib/pl-engine/compute'
@@ -43,7 +43,7 @@ function KpiStrip({ campaigns }: Props) {
 
 function SpendSalesBar({ campaigns }: Props) {
   const colors = useChartColors()
-  const top8 = campaigns.slice(0, 8)
+  const top8 = [...campaigns].sort((a, b) => b.spend - a.spend).slice(0, 8)
   const data = top8.map(c => ({
     name: c.campaign_name.length > 20 ? c.campaign_name.slice(0, 20) + '…' : c.campaign_name,
     Spend: c.spend,
@@ -112,22 +112,11 @@ function AcosBubble({ campaigns }: Props) {
           <ZAxis dataKey="orders" range={[40, 400]} name="Orders" />
           <Tooltip
             cursor={{ strokeDasharray: '3 3' }}
-            content={({ payload }) => {
-              if (!payload?.length) return null
-              const d = payload[0].payload as typeof data[0]
-              return (
-                <div className="bg-surface-card border border-border-default rounded-lg p-2 text-xs text-text-primary">
-                  <p className="font-medium truncate max-w-[180px]">{d.name}</p>
-                  <p>Spend: {formatINR(d.spend)}</p>
-                  <p>ACOS: {d.acos}%</p>
-                  <p>Orders: {d.orders}</p>
-                </div>
-              )
-            }}
+            contentStyle={{ background: 'var(--surface-card)', border: '1px solid var(--border-default)', borderRadius: 8, fontSize: 12, color: 'var(--text-primary)' }}
           />
           <Scatter data={data} fill={colors.teal}>
             {data.map((entry, i) => (
-              <circle key={i} fill={entry.fill} />
+              <Cell key={i} fill={entry.fill} />
             ))}
           </Scatter>
         </ScatterChart>
